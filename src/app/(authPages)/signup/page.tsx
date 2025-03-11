@@ -65,7 +65,7 @@ export default async function Signup({ searchParams }: SignupProps) {
                 </Link>
               </p>
               <p className="text-xs text-gray-500 text-center mt-4">
-                By registering, you agree to the CVPHOTO{" "}
+                By registering, you agree to the YouPhotoshoot{" "}
                 <Link
                   href="/terms"
                   className="text-mainBlack hover:text-gray-700 transition-colors"

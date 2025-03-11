@@ -8,7 +8,7 @@ export default function Terms() {
 
   useEffect(() => {
     // Set the document title
-    document.title = "Terms and Conditions | CVPHOTO.app";
+    document.title = "Terms and Conditions | YouPhotoshoot";
   }, []);
 
   return (
@@ -29,7 +29,7 @@ export default function Terms() {
           <p className="mb-4">
             <strong>1. Introduction</strong>
             <br />
-            By using CVPHOTO.app, you confirm your acceptance of, and agree to
+            By using YouPhotoshoot, you confirm your acceptance of, and agree to
             be bound by, these terms and conditions for our AI headshot
             generation service.
           </p>
@@ -37,12 +37,12 @@ export default function Terms() {
             <strong>2. Agreement to Terms and Conditions</strong>
             <br />
             This Agreement takes effect on the date on which you first use the
-            CVPHOTO.app website or our AI headshot generation service.
+            YouPhotoshoot website or our AI headshot generation service.
           </p>
           <p className="mb-4">
             <strong>3. Service Access</strong>
             <br />
-            CVPHOTO.app offers various plans for AI-generated headshots. Our
+            YouPhotoshoot offers various plans for AI-generated headshots. Our
             service is purchased through a single transaction and provides
             access to AI-generated headshots based on the selected plan.
           </p>
@@ -58,7 +58,7 @@ export default function Terms() {
             <strong>5. Disclaimer</strong>
             <br />
             While we strive for high-quality results, it is not warranted that
-            CVPHOTO.app will meet all your requirements or that its operation
+            YouPhotoshoot will meet all your requirements or that its operation
             will be uninterrupted or error-free. All express and implied
             warranties or conditions not stated in this Agreement are excluded
             and expressly disclaimed to the fullest extent permitted by law.
@@ -66,7 +66,7 @@ export default function Terms() {
           <p className="mb-4">
             <strong>6. Warranties and Limitation of Liability</strong>
             <br />
-            CVPHOTO.app provides its AI headshot generation service &quot;as
+            YouPhotoshoot provides its AI headshot generation service &quot;as
             is&quot; without any warranty. We shall not be liable for any
             indirect, special, or consequential loss or damage arising from the
             use of our service. Our liability, if any, is limited to the amount
@@ -76,7 +76,7 @@ export default function Terms() {
             <strong>7. Responsibilities</strong>
             <br />
             You are responsible for the photos you upload and how you use the
-            AI-generated headshots. CVPHOTO.app is not responsible for any
+            AI-generated headshots. YouPhotoshoot is not responsible for any
             misuse of the generated content.
           </p>
           <p className="mb-4">

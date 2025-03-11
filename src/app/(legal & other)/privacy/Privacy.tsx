@@ -8,7 +8,7 @@ export default function Privacy() {
 
   useEffect(() => {
     // Set the document title
-    document.title = "Privacy Policy | CVPHOTO.app";
+    document.title = "Privacy Policy | YouPhotoshoot";
   }, []);
 
   return (
@@ -27,9 +27,9 @@ export default function Privacy() {
             Privacy Policy
           </h1>
           <p className="mb-4">
-            Your privacy is important to us. It is CVPHOTO&apos;s policy to
+            Your privacy is important to us. It is YouPhotoshoot&apos;s policy to
             respect your privacy regarding any information we may collect from
-            you across our website, CVPHOTO.app, and other sites we own and
+            you across our website, YouPhotoshoot, and other sites we own and
             operate.
           </p>
           <p className="mb-4">
@@ -58,7 +58,7 @@ export default function Privacy() {
           </p>
           <p className="mb-4">
             We act in the capacity of a data controller and a data processor
-            with regard to the personal data processed through CVPHOTO.app and
+            with regard to the personal data processed through YouPhotoshoot and
             our AI headshot generation services in terms of the applicable data
             protection laws, including the EU General Data Protection Regulation
             (GDPR).

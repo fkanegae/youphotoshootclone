@@ -9,7 +9,7 @@ const FooterLogo: React.FC = () => (
     <div className="flex items-center gap-2 sm:gap-2.5">
       <Logo className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
       <span className="font-sans font-light tracking-wider text-mainWhite text-base sm:text-lg md:text-xl uppercase">
-        cvphoto
+        youphotoshoot
       </span>
     </div>
   </div>
@@ -25,7 +25,7 @@ const FooterContent: React.FC = () => (
       Trusted by individuals, teams, and photographers
     </p>
     <p className="mt-4 text-mainWhite text-opacity-50 text-xs">
-      © 2024 CVPHOTO - All rights reserved
+      © 2024 YouPhotoshoot - All rights reserved
     </p>
   </div>
 );

@@ -27,7 +27,7 @@ const LeftAuth: React.FC = () => {
         <div className="flex items-center gap-2 mt-10">
           <Logo className="w-7 h-7" />
           <span className="font-sans font-light tracking-wider text-mainWhite text-xl uppercase">
-            cvphoto
+            youphotoshoot
           </span>
         </div>
       </div>

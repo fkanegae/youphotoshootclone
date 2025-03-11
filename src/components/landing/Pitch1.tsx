@@ -33,7 +33,7 @@ export default function Pitch1() {
                       d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  With CVPHOTO
+                  With YouPhotoshoot
                 </h2>
                 <div className="bg-mainBlack text-mainGreen font-bold py-2 px-3 text-sm sm:text-base sm:px-4 rounded-lg whitespace-nowrap">
                   Studio Quality

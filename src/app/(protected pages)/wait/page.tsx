@@ -21,8 +21,8 @@ export default async function Page() {
       // Send email - Message to users: "Done, please wait...""
       await sendEmail({
         to: email, // Use user's email from userData
-        from: process.env.NOREPLY_EMAIL || "noreply@cvphoto.app", // Using env variable with fallback
-        templateId: "d-d966d02f4a324abeb43a1d7045da520a", // Replace with your template ID
+        from: process.env.NOREPLY_EMAIL || "youphotoshootai@gmail.com", // Using env variable with fallback
+        templateId: "d-adfd220b326648c68b474020d6196f8f", // Replace with your template ID
       });
 
       // Schedule second email with 2 hour delay - Message to users: "Your photos are ready!"
@@ -33,8 +33,8 @@ export default async function Page() {
 
       await sendEmail({
         to: email,
-        from: process.env.NOREPLY_EMAIL || "noreply@cvphoto.app",
-        templateId: "d-e937e48db4b945af9279e85baa1683e4", // Updated template ID for scheduled email
+        from: process.env.NOREPLY_EMAIL || "youphotoshootai@gmail.com",
+        templateId: "d-adfd220b326648c68b474020d6196f8f", // Updated template ID for scheduled email
         sendAt: sendAt,
       });
     }

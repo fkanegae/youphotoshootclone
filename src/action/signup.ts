@@ -8,8 +8,8 @@ import { sendEmail } from "./sendEmail";
 async function sendWelcomeEmail(email: string) {
   return await sendEmail({
     to: email,
-    from: process.env.NOREPLY_EMAIL || 'noreply@cvphoto.app',
-    templateId: 'd-def6b236e0a64721a3420e36b19cd379',
+    from: process.env.NOREPLY_EMAIL || 'youphotoshootai@gmail.com',
+    templateId: 'd-adfd220b326648c68b474020d6196f8f',
   });
 }
 
