@@ -4,30 +4,42 @@ import { createClient } from "@/utils/supabase/server";
 export default async function getUser() {
   const supabase = createClient();
   
-  // Get the current authenticated user
-  const { data: { user } } = await supabase.auth.getUser();
-  const userId = user?.id;
+  try {
+    // Get the current authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError) {
+      console.error("Auth error:", authError);
+      return null;
+    }
+    
+    const userId = user?.id;
 
-  if (!userId) {
-    console.error("No authenticated user found");
-    return null;
-  }
+    if (!userId) {
+      console.error("No authenticated user found");
+      return null;
+    }
 
-  // Query the 'userTable' for the current user's data
-  const { data, error } = await supabase
-    .from('userTable')
-    .select()
-    .eq('id', userId);
- 
-  if (error) {
-    console.error("Error fetching user data from Supabase:", error);
-    return null;
-  }
+    // Query the 'userTable' for the current user's data
+    const { data, error } = await supabase
+      .from('userTable')
+      .select()
+      .eq('id', userId);
+   
+    if (error) {
+      console.error("Error fetching user data from Supabase:", error);
+      return null;
+    }
 
-  if (data && data.length > 0) {
-    return data;
-  } else {
-    console.warn("No user data found for the current user");
+    if (data && data.length > 0) {
+      console.log("User data found:", { id: data[0].id, workStatus: data[0].workStatus });
+      return data;
+    } else {
+      console.warn("No user data found for the current user");
+      return null;
+    }
+  } catch (error) {
+    console.error("Unexpected error in getUser:", error);
     return null;
   }
 }
