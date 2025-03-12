@@ -5,7 +5,6 @@ import Image from "next/image";
 import ClothingStyleModal from "./ClothingStyleModal";
 import styleData from "./styleData.json";
 import { updateStyles } from "@/action/updateStyles";
-import getUser from "@/action/getUser";
 
 interface BackgroundStyle {
   backgroundTitle: string;
@@ -33,40 +32,6 @@ export default function Page() {
     useState<StyleObject | null>(null);
   // State for tracking processing status
   const [isProcessing, setIsProcessing] = useState(false);
-  // State for storing user data
-  const [userData, setUserData] = useState<any>(null);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const data = await getUser();
-      if (data && data.length > 0) {
-        setUserData(data[0]);
-      }
-    };
-    fetchUserData();
-  }, []);
-
-  // Filter clothing styles based on gender
-  const getFilteredClothingStyles = () => {
-    if (!userData || !userData.gender) return styleData.clothingStyles;
-
-    // Define clothing items that are specific to each gender
-    const maleSpecific = [
-      "suit", "blazer", "kandura", "tuxedo"
-    ];
-    const femaleSpecific = [
-      "dress", "blouse", "gown", "skirt"
-    ];
-
-    return styleData.clothingStyles.filter(style => {
-      const lowerTitle = style.clothingTitle.toLowerCase();
-      if (userData.gender === "man") {
-        return !femaleSpecific.some(item => lowerTitle.includes(item));
-      } else {
-        return !maleSpecific.some(item => lowerTitle.includes(item));
-      }
-    });
-  };
 
   // Add this new function to check if a style is already selected
   const isStyleSelected = (backgroundStyle: StyleObject) => {
@@ -119,7 +84,6 @@ export default function Page() {
   const handleChooseForMe = () => {
     const remainingSlots = 6 - selectedStyles.length;
     const newStyles: StyleObject[] = [];
-    const filteredClothingStyles = getFilteredClothingStyles();
 
     for (let i = 0; i < remainingSlots; i++) {
       const randomBackgroundStyle =
@@ -127,8 +91,8 @@ export default function Page() {
           Math.floor(Math.random() * styleData.backgroundStyles.length)
         ];
       const randomClothingStyle =
-        filteredClothingStyles[
-          Math.floor(Math.random() * filteredClothingStyles.length)
+        styleData.clothingStyles[
+          Math.floor(Math.random() * styleData.clothingStyles.length)
         ];
       newStyles.push({
         backgroundTitle: randomBackgroundStyle.backgroundTitle,
@@ -141,60 +105,34 @@ export default function Page() {
     setSelectedStyles([...selectedStyles, ...newStyles]);
   };
 
-  // Update preselectedStyles to use StyleObject and be gender-specific
-  const getPreselectedStyles = (): StyleObject[] => {
-    if (!userData || !userData.gender) return [];
-
-    const commonStyles = [
-      {
-        backgroundTitle: "Garden",
-        backgroundPrompt: "Lush garden with colorful flowers and green foliage",
-        clothingTitle: "White button-up shirt",
-        clothingPrompt: "Person wearing a clean, classic white button-up shirt",
-      },
-      {
-        backgroundTitle: "Office",
-        backgroundPrompt: "Modern office setting with a desk and computer",
-        clothingTitle: "Black v-neck sweater",
-        clothingPrompt: "Person wearing a casual black v-neck sweater",
-      },
-    ];
-
-    const maleStyles = [
-      {
-        backgroundTitle: "Grey",
-        backgroundPrompt: "Neutral grey background",
-        clothingTitle: "Light gray suit jacket",
-        clothingPrompt: "Professional light gray suit jacket with subtle texture",
-      },
-      {
-        backgroundTitle: "Outdoors",
-        backgroundPrompt: "Outdoor scene with trees and a path",
-        clothingTitle: "Navy blue short-sleeve polo",
-        clothingPrompt: "Professional navy blue short-sleeve polo with subtle texture",
-      },
-    ];
-
-    const femaleStyles = [
-      {
-        backgroundTitle: "Grey",
-        backgroundPrompt: "Neutral grey background",
-        clothingTitle: "Light gray cardigan",
-        clothingPrompt: "Classic light gray cardigan with subtle texture",
-      },
-      {
-        backgroundTitle: "Outdoors",
-        backgroundPrompt: "Outdoor scene with trees and a path",
-        clothingTitle: "Light gray ribbed turtleneck",
-        clothingPrompt: "Casual light gray ribbed turtleneck with subtle texture",
-      },
-    ];
-
-    return [
-      ...commonStyles,
-      ...(userData.gender === "man" ? maleStyles : femaleStyles),
-    ];
-  };
+  // Update preselectedStyles to use StyleObject
+  const preselectedStyles: StyleObject[] = [
+    {
+      backgroundTitle: "Garden",
+      backgroundPrompt: "Lush garden with colorful flowers and green foliage",
+      clothingTitle: "White buttoned shirt",
+      clothingPrompt: "Person wearing a white buttoned shirt",
+    },
+    {
+      backgroundTitle: "Office",
+      backgroundPrompt: "Modern office setting with a desk and computer",
+      clothingTitle: "Black sweater",
+      clothingPrompt: "Person wearing a black sweater",
+    },
+    {
+      backgroundTitle: "Grey",
+      backgroundPrompt: "Neutral grey background",
+      clothingTitle: "Light gray suit jacket over a white dress shirt",
+      clothingPrompt:
+        "Person wearing a light gray suit jacket over a white dress shirt",
+    },
+    {
+      backgroundTitle: "Outdoors",
+      backgroundPrompt: "Outdoor scene with trees and a path",
+      clothingTitle: "Black sweater",
+      clothingPrompt: "Person wearing a black sweater",
+    },
+  ];
 
   // Update handleContinue to use the new structure
   const handleContinue = async () => {
@@ -203,7 +141,7 @@ export default function Page() {
       try {
         await updateStyles({
           userSelected: selectedStyles,
-          preSelected: getPreselectedStyles(),
+          preSelected: preselectedStyles,
         });
         // The redirect is handled in the server action
       } catch (error) {
@@ -383,7 +321,7 @@ export default function Page() {
                 Preselected styles
               </h3>
               <div className="grid grid-cols-1 gap-2">
-                {getPreselectedStyles().map((style, index) => (
+                {preselectedStyles.map((style, index) => (
                   <div
                     key={index}
                     className="bg-white rounded-lg p-3 text-mainBlack relative shadow-sm"
@@ -428,7 +366,7 @@ export default function Page() {
         onSelect={(clothingStyle) =>
           handleSelectClick(currentBackgroundStyle!, clothingStyle)
         }
-        clothingStyles={getFilteredClothingStyles()}
+        clothingStyles={styleData.clothingStyles}
       />
     </div>
   );
