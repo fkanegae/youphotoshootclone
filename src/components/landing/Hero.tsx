@@ -4,18 +4,6 @@ import { AvatarGroupWithInfo } from "./AvatarGroup";
 import Image from "next/image";
 import ParallaxCards from './DemoCard';
 
-const NumberOne = () => (
-  <div className="mb-4 flex justify-center">
-    <Image
-      src="/NumberOne.svg"
-      alt="The #1 Professional AI Photo Generator"
-      width={200}
-      height={50}
-      priority
-    />
-  </div>
-);
-
 const HeadingText = () => (
   <h1 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl flex flex-col items-center py-4 max-w-5xl mx-auto">
     <span>Professional headshots</span>
@@ -75,7 +63,6 @@ const Hero = () => {
       <div className="max-w-section mx-auto px-section">
         <div className="flex flex-col items-center text-center space-y-8">
           <div className="space-y-4">
-            <NumberOne />
             <HeadingText />
             <Description />
           </div>

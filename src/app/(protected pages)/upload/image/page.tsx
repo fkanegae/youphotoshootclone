@@ -12,7 +12,7 @@ export default function Page() {
   const [images, setImages] = useState<Array<{ file: File; pixels: number }>>(
     []
   );
-  const maxImages = 15;
+  const maxImages = 10;
   const { uploadImages, isUploading, error: uploadError } = useImageUpload();
   const [isUploadingState, setIsUploading] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
