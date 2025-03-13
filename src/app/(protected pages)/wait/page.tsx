@@ -132,7 +132,7 @@ export default async function Page() {
                   clipRule="evenodd"
                 />
               </svg>
-              Founded in Sweden. We respect your high standards.
+              Founded in Europe. We respect your high standards.
             </li>
           </ul>
           <p className="mt-4 text-sm text-gray-500">

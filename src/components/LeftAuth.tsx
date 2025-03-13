@@ -7,7 +7,7 @@ const NumberOne = () => (
   <div className="mb-4">
     <Image
       src="/NumberOne.svg"
-      alt="The #1 AI Headshot Generator in Sweden"
+      alt="The #1 Professional AI Photo Generator"
       width={200}
       height={50}
       priority

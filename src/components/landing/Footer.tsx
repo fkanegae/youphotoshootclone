@@ -18,7 +18,7 @@ const FooterLogo: React.FC = () => (
 const FooterContent: React.FC = () => (
   <div className="text-center md:text-left">
     <p className="mt-2 text-mainWhite text-sm">
-      #1 AI Photo Generator in Sweden. Professional headshots • Studio quality
+      #1 Professional AI Photo Generator. Professional headshots • Studio quality
       at home • 100+ styles
     </p>
     <p className="mt-2 text-mainWhite text-opacity-70 text-xs">

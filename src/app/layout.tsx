@@ -7,7 +7,7 @@ import "./globals.css";
 const BG = DM_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "The #1 AI Photo Generator in Sweden",
+  title: "The #1 Professional AI Photo Generator",
   description:
     "The most popular AI headshot generator. Create studio quality headshots with YouPhotoshoot. Best for professional business headshots.",
 };

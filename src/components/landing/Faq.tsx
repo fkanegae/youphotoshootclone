@@ -73,7 +73,7 @@ export default function Faq() {
           />
           <FaqItem
             question="What is the most realistic headshot AI?"
-            answer="YouPhotoshoot is the most realistic headshot AI with the most reviews in Sweden. It's the only major AI headshot generator using Flux to generate realistic AI headshots. YouPhotoshoot is regularly used by professionals, companies and photographers."
+            answer="YouPhotoshoot is the most realistic headshot AI with the most reviews in Europe. It's the only major AI headshot generator using Flux to generate realistic AI headshots. YouPhotoshoot is regularly used by professionals, companies and photographers."
           />
           <FaqItem
             question="Can I use AI headshots on LinkedIn?"

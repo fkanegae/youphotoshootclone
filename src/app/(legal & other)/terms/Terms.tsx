@@ -96,7 +96,7 @@ export default function Terms() {
           <p className="mb-4">
             <strong>10. General Terms and Law</strong>
             <br />
-            This Agreement is governed by the laws of Sweden. You acknowledge
+            This Agreement is governed by the laws of Europe. You acknowledge
             that no joint venture, partnership, employment, or agency
             relationship exists between you and as a result of your use of our
             services.

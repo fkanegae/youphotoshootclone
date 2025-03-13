@@ -8,7 +8,7 @@ const NumberOne = () => (
   <div className="mb-4 flex justify-center">
     <Image
       src="/NumberOne.svg"
-      alt="The #1 AI Headshot Generator in Sweden"
+      alt="The #1 Professional AI Photo Generator"
       width={200}
       height={50}
       priority
@@ -29,7 +29,7 @@ const HeadingText = () => (
 const Description = () => (
   <p className="text-mainWhite text-opacity-80 text-lg md:text-xl py-2 max-w-3xl mx-auto">
     Get professional headshots in minutes. Upload photos, pick your styles &
-    receive 100+ headshots. Created in Sweden.
+    receive 100+ headshots. Created in Europe.
   </p>
 );
 
