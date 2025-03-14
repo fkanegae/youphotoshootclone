@@ -3,52 +3,62 @@
       {
         "backgroundTitle": "Streets",
         "backgroundPrompt": "Vibrant urban street scene with soft focus buildings",
-        "image": "/background/Streets.jpg"
+        "menImage": "/background/men/Streets.jpg",
+        "womenImage": "/background/women/Streets.jpg"
       },
       {
         "backgroundTitle": "Bookshelf",
         "backgroundPrompt": "Soft focus bookshelf background in a library with scholarly ambiance",
-        "image": "/background/Bookshelf.jpg"
+        "menImage": "/background/men/Bookshelf.jpg",
+        "womenImage": "/background/women/Bookshelf.jpg"
       },
       {
         "backgroundTitle": "Garden",
         "backgroundPrompt": "Out-of-focus garden with muted colors and natural elements",
-        "image": "/background/Garden.jpg"
+        "menImage": "/background/men/Garden.jpg",
+        "womenImage": "/background/women/Garden.jpg"
       },
       {
         "backgroundTitle": "Marina",
         "backgroundPrompt": "Defocused marina scene with subtle water reflections",
-        "image": "/background/Marina.jpg"
+        "menImage": "/background/men/Marina.jpg",
+        "womenImage": "/background/women/Marina.jpg"
       },
       {
         "backgroundTitle": "Office",
         "backgroundPrompt": "Blurred modern office interior with professional atmosphere",
-        "image": "/background/Office.jpg"
+        "menImage": "/background/men/Office.jpg",
+        "womenImage": "/background/women/Office.jpg"
       },
       {
         "backgroundTitle": "Lake",
         "backgroundPrompt": "Serene lake scene with calm waters and surrounding landscape",
-        "image": "/background/Lake.jpg"
+        "menImage": "/background/men/Lake.jpg",
+        "womenImage": "/background/women/Lake.jpg"
       },
       {
         "backgroundTitle": "Cafe",
         "backgroundPrompt": "Cozy cafe with warm lighting and inviting atmosphere",
-        "image": "/background/Cafe.jpg"
+        "menImage": "/background/men/Cafe.jpg",
+        "womenImage": "/background/women/Cafe.jpg"
       },
       {
         "backgroundTitle": "Kitchen",
         "backgroundPrompt": "Modern kitchen with sleek appliances and clean countertops",
-        "image": "/background/Kitchen.jpg"
+        "menImage": "/background/men/Kitchen.jpg",
+        "womenImage": "/background/women/Kitchen.jpg"
       },
       {
         "backgroundTitle": "White",
         "backgroundPrompt": "Simple and smooth white background backdrop",
-        "image": "/background/White.jpg"
+        "menImage": "/background/men/White.jpg",
+        "womenImage": "/background/women/White.jpg"
       },
       {
         "backgroundTitle": "Red brick",
         "backgroundPrompt": "Warm red brick background with subtle texture",
-        "image": "/background/Red brick.jpg"
+        "menImage": "/background/men/Red brick.jpg",
+        "womenImage": "/background/women/Red brick.jpg"
       },
       {
         "backgroundTitle": "Yellow",

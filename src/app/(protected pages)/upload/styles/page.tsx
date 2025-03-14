@@ -12,9 +12,8 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 interface BackgroundStyle {
   backgroundTitle: string;
   backgroundPrompt: string;
-  image: string;
+  menImage: string;
   womenImage: string;
-  gender?: string; // Add gender to background style
 }
 
 interface ClothingStyle {
@@ -254,63 +253,49 @@ export default function Page() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
               {styleData.backgroundStyles.map((style, index) => {
-                // Construct the gender-specific image path
-                const genderPath = userData?.gender === "woman" ? "women" : "men";
-                const imagePath = style.image.replace("/background/", `/background/${genderPath}/`);
+                const isSelected = isStyleSelected(style);
+                const imagePath = userData?.gender === "woman" ? style.womenImage : style.menImage;
                 
                 return (
                   <div
                     key={index}
-                    className={`group bg-gray-100 rounded-lg shadow-md overflow-hidden transition-shadow ${
-                      isStyleSelected(style)
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:shadow-lg cursor-pointer"
-                    } relative`}
+                    className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer transition-transform duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg ${
+                      isSelected ? "opacity-50" : ""
+                    }`}
+                    onClick={() => handleCardClick(style)}
                   >
-                    {index < 3 && (
-                      <div className="absolute top-2 right-2 bg-gradient-to-r from-mainOrange to-mainGreen text-mainBlack text-xs font-bold px-2 py-1 rounded-full z-10 animate-gradient bg-[length:200%_200%]">
+                    <Image
+                      src={imagePath}
+                      alt={style.backgroundTitle}
+                      fill
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      className="object-cover"
+                    />
+                    {style.backgroundTitle === "Streets" && (
+                      <div className="absolute top-2 right-2 bg-mainYellow text-mainBlack text-xs font-semibold px-2 py-1 rounded-full">
                         Popular
                       </div>
                     )}
-                    <div
-                      className="relative"
-                      onClick={() =>
-                        !isStyleSelected(style) && handleCardClick(style)
-                      }
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
+                      <h3 className="text-white font-medium">{style.backgroundTitle}</h3>
+                    </div>
+                    <button
+                      className={`absolute inset-0 w-full h-full flex items-center justify-center ${
+                        isSelected ? "opacity-100" : "opacity-0 hover:opacity-100"
+                      } transition-opacity duration-300`}
                     >
-                      <Image
-                        src={userData?.gender === "woman" ? style.womenImage : style.image}
-                        alt={`${style.backgroundTitle} style placeholder`}
-                        width={200}
-                        height={200}
-                        className="w-full h-40 object-cover transition-opacity group-hover:opacity-90"
-                      />
-                      <div className="p-3">
-                        <p className="text-mainBlack font-semibold text-sm mb-2">
-                          {style.backgroundTitle}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="px-3 pb-3">
-                      <button
-                        className={`w-full text-center font-medium py-1.5 rounded text-sm transition-colors ${
-                          isStyleSelected(style)
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      <span
+                        className={`px-4 py-2 rounded-lg ${
+                          isSelected
+                            ? "bg-mainGreen text-white"
+                            : "bg-mainOrange text-white"
                         }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (!isStyleSelected(style)) {
-                            handleCardClick(style);
-                          }
-                        }}
-                        disabled={isStyleSelected(style)}
                       >
-                        {isStyleSelected(style) ? "Selected" : "Select +"}
-                      </button>
-                    </div>
+                        {isSelected ? "Selected ✓" : "Select +"}
+                      </span>
+                    </button>
                   </div>
                 );
               })}
