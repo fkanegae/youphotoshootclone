@@ -63,132 +63,158 @@
       {
         "backgroundTitle": "Yellow",
         "backgroundPrompt": "Bright and cheerful yellow background backdrop",
-        "image": "/background/Yellow.jpg"
+        "menImage": "/background/men/Yellow.jpg",
+        "womenImage": "/background/women/Yellow.jpg"
       },
       {
         "backgroundTitle": "Grey",
         "backgroundPrompt": "Neutral dark grey background backdrop",
-        "image": "/background/Grey.jpg"
+        "menImage": "/background/men/Grey.jpg",
+        "womenImage": "/background/women/Grey.jpg"
       },
       {
         "backgroundTitle": "Alley",
         "backgroundPrompt": "Narrow alleyway with brick walls and dim lighting",
-        "image": "/background/Alley.jpg"
+        "menImage": "/background/men/Alley.jpg",
+        "womenImage": "/background/women/Alley.jpg"
       },
       {
         "backgroundTitle": "Fence",
         "backgroundPrompt": "Wooden fence with intricate details and texture",
-        "image": "/background/Fence.jpg"
+        "menImage": "/background/men/Fence.jpg",
+        "womenImage": "/background/women/Fence.jpg"
       },
       {
         "backgroundTitle": "Park",
         "backgroundPrompt": "Lush park scene with greenery and walking paths",
-        "image": "/background/Park.jpg"
+        "menImage": "/background/men/Park.jpg",
+        "womenImage": "/background/women/Park.jpg"
       },
       {
         "backgroundTitle": "Building",
         "backgroundPrompt": "Modern building with sleek architecture and glass windows",
-        "image": "/background/Building.jpg"
+        "menImage": "/background/men/Building.jpg",
+        "womenImage": "/background/women/Building.jpg"
       },
       {
         "backgroundTitle": "Blue",
         "backgroundPrompt": "Calm blue background backdrop",
-        "image": "/background/Blue.jpg"
+        "menImage": "/background/men/Blue.jpg",
+        "womenImage": "/background/women/Blue.jpg"
       },
       {
         "backgroundTitle": "Realtor",
         "backgroundPrompt": "Professional realtor background with modern furniture",
-        "image": "/background/Realtor.jpg"
+        "menImage": "/background/men/Realtor.jpg",
+        "womenImage": "/background/women/Realtor.jpg"
       },
       {
         "backgroundTitle": "Window",
         "backgroundPrompt": "Simple window background with subtle texture",
-        "image": "/background/Window.jpg"
+        "menImage": "/background/men/Window.jpg",
+        "womenImage": "/background/women/Window.jpg"
       },
       {
         "backgroundTitle": "Golden gate",
         "backgroundPrompt": "Warm golden gate background with intricate details",
-        "image": "/background/Golden gate.jpg"
+        "menImage": "/background/men/Golden gate.jpg",
+        "womenImage": "/background/women/Golden gate.jpg"
       },
       {
         "backgroundTitle": "Tulips",
         "backgroundPrompt": "Vibrant tulip background with colorful flowers",
-        "image": "/background/Tulips.jpg"
+        "menImage": "/background/men/Tulips.jpg",
+        "womenImage": "/background/women/Tulips.jpg"
       },
       {
         "backgroundTitle": "French rooftop",
         "backgroundPrompt": "Charming French rooftop scene with ornate details",
-        "image": "/background/French rooftop.jpg"
+        "menImage": "/background/men/French rooftop.jpg",
+        "womenImage": "/background/women/French rooftop.jpg"
       },
       {
         "backgroundTitle": "Hotel",
         "backgroundPrompt": "Luxurious hotel background with modern furniture",
-        "image": "/background/Hotel.jpg"
+        "menImage": "/background/men/Hotel.jpg",
+        "womenImage": "/background/women/Hotel.jpg"
       },
       {
         "backgroundTitle": "Yellow brick",
         "backgroundPrompt": "Warm yellow brick background with subtle texture",
-        "image": "/background/Yellow brick.jpg"
+        "menImage": "/background/men/Yellow brick.jpg",
+        "womenImage": "/background/women/Yellow brick.jpg"
       },
       {
         "backgroundTitle": "Green",
         "backgroundPrompt": "Lush green background with subtle texture",
-        "image": "/background/Green.jpg"
+        "menImage": "/background/men/Green.jpg",
+        "womenImage": "/background/women/Green.jpg"
       },
       {
         "backgroundTitle": "Woods",
         "backgroundPrompt": "Serene woods scene with tall trees and calm atmosphere",
-        "image": "/background/Woods.jpg"
+        "menImage": "/background/men/Woods.jpg",
+        "womenImage": "/background/women/Woods.jpg"
       },
       {
         "backgroundTitle": "Lobby",
         "backgroundPrompt": "Modern lobby background with sleek furniture",
-        "image": "/background/Lobby.jpg"
+        "menImage": "/background/men/Lobby.jpg",
+        "womenImage": "/background/women/Lobby.jpg"
       },
       {
         "backgroundTitle": "Dark",
         "backgroundPrompt": "Simple dark background with subtle texture",
-        "image": "/background/Dark.jpg"
+        "menImage": "/background/men/Dark.jpg",
+        "womenImage": "/background/women/Dark.jpg"
       },
       {
         "backgroundTitle": "Patriotic Display",
         "backgroundPrompt": "Vibrant patriotic display background with colorful flags",
-        "image": "/background/Patriotic Display.jpg"
+        "menImage": "/background/men/Patriotic Display.jpg",
+        "womenImage": "/background/women/Patriotic Display.jpg"
       },
       {
         "backgroundTitle": "Beach Stairs",
         "backgroundPrompt": "Charming beach stairs scene with wooden details",
-        "image": "/background/Beach Stairs.jpg"
+        "menImage": "/background/men/Beach Stairs.jpg",
+        "womenImage": "/background/women/Beach Stairs.jpg"
       },
       {
         "backgroundTitle": "Brooklyn Waterfront",
         "backgroundPrompt": "Scenic Brooklyn waterfront scene with boats and calm waters",
-        "image": "/background/Brooklyn Waterfront.jpg"
+        "menImage": "/background/men/Brooklyn Waterfront.jpg",
+        "womenImage": "/background/women/Brooklyn Waterfront.jpg"
       },
       {
         "backgroundTitle": "Rustic Charm",
         "backgroundPrompt": "Cozy rustic charm background with wooden details",
-        "image": "/background/Rustic Charm.jpg"
+        "menImage": "/background/men/Rustic Charm.jpg",
+        "womenImage": "/background/women/Rustic Charm.jpg"
       },
       {
         "backgroundTitle": "Loft Interior",
         "backgroundPrompt": "Modern loft interior background with exposed brick",
-        "image": "/background/Loft Interior.jpg"
+        "menImage": "/background/men/Loft Interior.jpg",
+        "womenImage": "/background/women/Loft Interior.jpg"
       },
       {
         "backgroundTitle": "Urban Sunlight",
         "backgroundPrompt": "Bright urban sunlight background with modern architecture",
-        "image": "/background/Urban Sunlight.jpg"
+        "menImage": "/background/men/Urban Sunlight.jpg",
+        "womenImage": "/background/women/Urban Sunlight.jpg"
       },
       {
         "backgroundTitle": "Lush Greenery",
         "backgroundPrompt": "Lush greenery background with colorful flowers and foliage",
-        "image": "/background/Lush Greenery.jpg"
+        "menImage": "/background/men/Lush Greenery.jpg",
+        "womenImage": "/background/women/Lush Greenery.jpg"
       },
       {
         "backgroundTitle": "Wildflower Field",
         "backgroundPrompt": "Expansive field filled with colorful wildflowers",
-        "image": "/background/Wildflower Field.jpg"
+        "menImage": "/background/men/Wildflower Field.jpg",
+        "womenImage": "/background/women/Wildflower Field.jpg"
       }
     ],
     "clothingStyles": [
