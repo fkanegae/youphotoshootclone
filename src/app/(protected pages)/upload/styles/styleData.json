@@ -219,13 +219,6 @@
     ],
     "clothingStyles": [
       {
-        "clothingTitle": "Fitted black turtleneck shirt",
-        "clothingPrompt": "Sleek, fitted black turtleneck shirt",
-        "menImage": "/clothing/men/Fitted black turtleneck shirt.jpg",
-        "womenImage": "/clothing/women/Fitted black turtleneck shirt.jpg",
-        "gender": ["man", "woman"]
-      },
-      {
         "clothingTitle": "Navy blazer with light blue shirt",
         "clothingPrompt": "Navy blazer over a light blue dress shirt, business attire",
         "menImage": "/clothing/men/Navy blazer with light blue shirt.jpg",
@@ -244,41 +237,6 @@
         "gender": ["man"]
       },
       {
-        "clothingTitle": "White button-up shirt",
-        "clothingPrompt": "Clean, classic white button-up shirt",
-        "menImage": "/clothing/men/White button-up shirt.jpg",
-        "womenImage": "/clothing/women/White button-up shirt.jpg",
-        "gender": ["man", "woman"]
-      },
-      {
-        "clothingTitle": "Dark gray patterned blazer",
-        "clothingPrompt": "Professional dark gray patterned blazer with matching trousers",
-        "menImage": "/clothing/men/Dark gray patterned blazer.jpg",
-        "womenImage": "/clothing/women/Dark gray patterned blazer.jpg",
-        "gender": ["man", "woman"]
-      },
-      {
-        "clothingTitle": "Blue scrub set",
-        "clothingPrompt": "Medical blue scrub set with white accents",
-        "menImage": "/clothing/men/Blue scrub set.jpg",
-        "womenImage": "/clothing/women/Blue scrub set.jpg",
-        "gender": ["man", "woman"]
-      },
-      {
-        "clothingTitle": "White lab coat with black outfit",
-        "clothingPrompt": "Scientific white lab coat with black trousers and accessories",
-        "menImage": "/clothing/men/White lab coat with black outfit.jpg",
-        "womenImage": "/clothing/women/White lab coat with black outfit.jpg",
-        "gender": ["man", "woman"]
-      },
-      {
-        "clothingTitle": "Black v-neck sweater",
-        "clothingPrompt": "Casual black v-neck sweater with subtle texture",
-        "menImage": "/clothing/men/Black v-neck sweater.jpg",
-        "womenImage": "/clothing/women/Black v-neck sweater.jpg",
-        "gender": ["man", "woman"]
-      },
-      {
         "clothingTitle": "Black long-sleeve button-up shirt",
         "clothingPrompt": "Classic black long-sleeve button-up shirt with subtle texture",
         "menImage": "/clothing/men/Black long-sleeve button-up shirt.jpg",
@@ -289,192 +247,6 @@
         "clothingPrompt": "Simple white t-shirt with black trousers and sneakers",
         "menImage": "/clothing/men/White t-shirt and black trousers.jpg",
         "gender": ["man"]
-      },
-      {
-        "clothingTitle": "Black and white striped polo",
-        "clothingPrompt": "Classic black and white striped polo with subtle texture",
-        "image": "/clothing/Black and white striped polo.jpg",
-        "gender": ["man"]
-      },
-      {
-        "clothingTitle": "Light blue short-sleeve button-down",
-        "clothingPrompt": "Casual light blue short-sleeve button-down with subtle texture",
-        "image": "/clothing/Light blue short-sleeve button-down.jpg",
-        "gender": ["man"]
-      },
-      {
-        "clothingTitle": "Navy blue short-sleeve polo",
-        "clothingPrompt": "Professional navy blue short-sleeve polo with subtle texture",
-        "image": "/clothing/Navy blue short-sleeve polo.jpg",
-        "gender": ["man"]
-      },
-      {
-        "clothingTitle": "Cream short-sleeve polo",
-        "clothingPrompt": "Casual cream short-sleeve polo with subtle texture",
-        "image": "/clothing/Cream short-sleeve polo.jpg",
-        "gender": ["man"]
-      },
-      {
-        "clothingTitle": "Light gray blazer",
-        "clothingPrompt": "Professional light gray blazer with subtle texture",
-        "image": "/clothing/Light gray blazer.jpg",
-        "gender": ["man", "woman"]
-      },
-      {
-        "clothingTitle": "Light blue denim shirt",
-        "clothingPrompt": "Casual light blue denim shirt with subtle texture",
-        "image": "/clothing/Light blue denim shirt.jpg",
-        "gender": ["man"]
-      },
-      {
-        "clothingTitle": "Blue and white checked button-up",
-        "clothingPrompt": "Classic blue and white checked button-up with subtle texture",
-        "image": "/clothing/Blue and white checked button-up.jpg",
-        "gender": ["man"]
-      },
-      {
-        "clothingTitle": "Light gray ribbed turtleneck",
-        "clothingPrompt": "Casual light gray ribbed turtleneck with subtle texture",
-        "image": "/clothing/Light gray ribbed turtleneck.jpg",
-        "gender": ["man", "woman"]
-      },
-      {
-        "clothingTitle": "Blue and orange plaid shirt",
-        "clothingPrompt": "Classic blue and orange plaid shirt with subtle texture",
-        "image": "/clothing/Blue and orange plaid shirt.jpg",
-        "gender": ["man"]
-      },
-      {
-        "clothingTitle": "Dark green blazer outfit",
-        "clothingPrompt": "Professional dark green blazer outfit with subtle texture",
-        "image": "/clothing/Dark green blazer outfit.jpg",
-        "gender": ["man", "woman"]
-      },
-      {
-        "clothingTitle": "Multicolored striped sweater",
-        "clothingPrompt": "Casual multicolored striped sweater with subtle texture",
-        "image": "/clothing/Multicolored striped sweater.jpg",
-        "gender": ["man", "woman"]
-      },
-      {
-        "clothingTitle": "Elegant black blazer dress",
-        "clothingPrompt": "Professional black blazer dress with feminine cut",
-        "womenImage": "/clothing/women/Elegant black blazer dress.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Navy pencil dress",
-        "clothingPrompt": "Classic navy pencil dress with subtle details",
-        "womenImage": "/clothing/women/Navy pencil dress.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "White blouse with bow",
-        "clothingPrompt": "Elegant white blouse with feminine bow detail",
-        "womenImage": "/clothing/women/White blouse with bow.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Cream silk blouse",
-        "clothingPrompt": "Luxurious cream silk blouse with subtle draping",
-        "womenImage": "/clothing/women/Cream silk blouse.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Black fitted blazer",
-        "clothingPrompt": "Professional black fitted blazer with feminine cut",
-        "womenImage": "/clothing/women/Black fitted blazer.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Light blue wrap blouse",
-        "clothingPrompt": "Elegant light blue wrap blouse with feminine draping",
-        "womenImage": "/clothing/women/Light blue wrap blouse.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Navy structured dress",
-        "clothingPrompt": "Professional navy structured dress with subtle details",
-        "womenImage": "/clothing/women/Navy structured dress.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Burgundy knit sweater",
-        "clothingPrompt": "Cozy burgundy knit sweater with feminine fit",
-        "womenImage": "/clothing/women/Burgundy knit sweater.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Gray tweed blazer",
-        "clothingPrompt": "Classic gray tweed blazer with feminine cut",
-        "womenImage": "/clothing/women/Gray tweed blazer.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "White sleeveless blouse",
-        "clothingPrompt": "Elegant white sleeveless blouse with subtle details",
-        "womenImage": "/clothing/women/White sleeveless blouse.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Professional black dress",
-        "clothingPrompt": "Sophisticated black dress with modern silhouette",
-        "womenImage": "/clothing/women/Professional black dress.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Navy sheath dress",
-        "clothingPrompt": "Classic navy sheath dress with tailored fit",
-        "womenImage": "/clothing/women/Navy sheath dress.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "White ruffled blouse",
-        "clothingPrompt": "Elegant white blouse with delicate ruffles",
-        "womenImage": "/clothing/women/White ruffled blouse.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Beige silk top",
-        "clothingPrompt": "Luxurious beige silk top with flowing design",
-        "womenImage": "/clothing/women/Beige silk top.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Charcoal fitted blazer",
-        "clothingPrompt": "Modern charcoal blazer with feminine tailoring",
-        "womenImage": "/clothing/women/Charcoal fitted blazer.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Pink wrap blouse",
-        "clothingPrompt": "Feminine pink wrap blouse with elegant draping",
-        "womenImage": "/clothing/women/Pink wrap blouse.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Black pencil dress",
-        "clothingPrompt": "Classic black pencil dress with sophisticated details",
-        "womenImage": "/clothing/women/Black pencil dress.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Red knit cardigan",
-        "clothingPrompt": "Stylish red knit cardigan with feminine silhouette",
-        "womenImage": "/clothing/women/Red knit cardigan.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Cream blazer",
-        "clothingPrompt": "Elegant cream blazer with refined details",
-        "womenImage": "/clothing/women/Cream blazer.jpg",
-        "gender": ["woman"]
-      },
-      {
-        "clothingTitle": "Floral silk blouse",
-        "clothingPrompt": "Delicate floral silk blouse with feminine pattern",
-        "womenImage": "/clothing/women/Floral silk blouse.jpg",
-        "gender": ["woman"]
       },
       {
         "clothingTitle": "Pink v collar blouse",
@@ -495,9 +267,27 @@
         "gender": ["woman"]
       },
       {
+        "clothingTitle": "Floral silk blouse",
+        "clothingPrompt": "Delicate floral silk blouse with feminine pattern",
+        "womenImage": "/clothing/women/Floral silk blouse.jpg",
+        "gender": ["woman"]
+      },
+      {
         "clothingTitle": "Cream blazer with black shirt",
         "clothingPrompt": "Professional cream blazer paired with black shirt",
         "womenImage": "/clothing/women/Cream blazer with black shirt.jpg",
+        "gender": ["woman"]
+      },
+      {
+        "clothingTitle": "Red knit cardigan",
+        "clothingPrompt": "Stylish red knit cardigan with feminine silhouette",
+        "womenImage": "/clothing/women/Red knit cardigan.jpg",
+        "gender": ["woman"]
+      },
+      {
+        "clothingTitle": "Pink wrap blouse",
+        "clothingPrompt": "Feminine pink wrap blouse with elegant draping",
+        "womenImage": "/clothing/women/Pink wrap blouse.jpg",
         "gender": ["woman"]
       },
       {
