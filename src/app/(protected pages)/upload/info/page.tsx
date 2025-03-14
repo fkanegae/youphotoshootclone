@@ -89,7 +89,7 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen bg-mainWhite p-4">
+    <div className="min-h-screen bg-[#FAF9F6] p-4 md:p-8">
       <div className="max-w-[240px] mx-auto mb-5">
         <div className="flex justify-between items-center gap-2">
           {[1, 2, 3, 4, 5].map((step) => (
@@ -107,17 +107,17 @@ export default function Page() {
         <p className="text-[11px] text-mainBlack mt-2">Step 2 of 5</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-6">
-        <h1 className="text-4xl font-bold text-mainBlack mb-2">
+      <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+        <h1 className="text-[40px] font-bold text-mainBlack mb-4">
           Tell us about yourself
         </h1>
         <p className="text-lg text-mainBlack mb-8">
           This helps us generate photos that match your appearance.
         </p>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="block text-lg font-medium text-mainBlack mb-2">
               Name
             </label>
             <input
@@ -127,12 +127,13 @@ export default function Page() {
               value={formData.name}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
+              placeholder="Enter your name"
             />
           </div>
 
           <div>
-            <label htmlFor="age" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="age" className="block text-lg font-medium text-mainBlack mb-2">
               Age Range
             </label>
             <select
@@ -141,7 +142,7 @@ export default function Page() {
               value={formData.age}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
             >
               <option value="">Select age range</option>
               <option value="18-25 years">18-25 years</option>
@@ -155,7 +156,7 @@ export default function Page() {
           </div>
 
           <div>
-            <label htmlFor="ethnicity" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="ethnicity" className="block text-lg font-medium text-mainBlack mb-2">
               Ethnicity
             </label>
             <select
@@ -164,7 +165,7 @@ export default function Page() {
               value={formData.ethnicity}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
             >
               <option value="">Select ethnicity</option>
               <option value="Asian">Asian</option>
@@ -178,7 +179,7 @@ export default function Page() {
           </div>
 
           <div>
-            <label htmlFor="height" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="height" className="block text-lg font-medium text-mainBlack mb-2">
               Height Range
             </label>
             <select
@@ -187,7 +188,7 @@ export default function Page() {
               value={formData.height}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
             >
               <option value="">Select height range</option>
               <option value="Less than 150 cm (Less than 4&apos;11&quot;)">Less than 150 cm (Less than 4&apos;11&quot;)</option>
@@ -200,7 +201,7 @@ export default function Page() {
           </div>
 
           <div>
-            <label htmlFor="bodyType" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="bodyType" className="block text-lg font-medium text-mainBlack mb-2">
               Body Type
             </label>
             <select
@@ -209,7 +210,7 @@ export default function Page() {
               value={formData.bodyType}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
             >
               <option value="">Select body type</option>
               <option value="Ectomorph (Lean)">Ectomorph (Lean)</option>
@@ -219,7 +220,7 @@ export default function Page() {
           </div>
 
           <div>
-            <label htmlFor="eyeColor" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="eyeColor" className="block text-lg font-medium text-mainBlack mb-2">
               Eye Color
             </label>
             <select
@@ -228,7 +229,7 @@ export default function Page() {
               value={formData.eyeColor}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
             >
               <option value="">Select eye color</option>
               <option value="Brown">Brown</option>
@@ -241,7 +242,7 @@ export default function Page() {
           </div>
 
           <div>
-            <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="gender" className="block text-lg font-medium text-mainBlack mb-2">
               Gender
             </label>
             <select
@@ -250,24 +251,22 @@ export default function Page() {
               value={formData.gender}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
             >
               <option value="">Select gender</option>
-              <option value="woman">Woman</option>
               <option value="man">Man</option>
+              <option value="woman">Woman</option>
             </select>
           </div>
-        </div>
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-mainOrange hover:bg-mainOrange-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mainOrange ${
-            isLoading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-        >
-          {isLoading ? "Saving..." : "Continue"}
-        </button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-mainYellow text-mainBlack font-semibold py-3 px-4 rounded-md hover:bg-mainYellow/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mainYellow mt-8"
+          >
+            {isLoading ? "Saving..." : "Continue"}
+          </button>
+        </div>
       </form>
     </div>
   );
