@@ -1,9 +1,14 @@
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import getUser from "@/action/getUser";
+
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 interface ClothingStyle {
   clothingTitle: string;
   clothingPrompt: string;
-  image: string;
+  menImage?: string;
+  womenImage?: string;
   gender: string[];
 }
 
@@ -15,6 +20,23 @@ interface ClothingStyleModalProps {
 }
 
 export default function ClothingStyleModal({ isOpen, onClose, onSelect, clothingStyles }: ClothingStyleModalProps) {
+  const [userData, setUserData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (isDevelopment) {
+        setUserData({
+          gender: "woman", // or "man" - change this to test different genders
+        });
+        return;
+      }
+
+      const data = await getUser();
+      setUserData(data?.[0]);
+    };
+    fetchUserData();
+  }, []);
+
   if (!isOpen) return null;
 
   return (
@@ -47,33 +69,37 @@ export default function ClothingStyleModal({ isOpen, onClose, onSelect, clothing
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {clothingStyles.map((style, index) => (
-            <div
-              key={index}
-              className="group bg-gray-100 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg cursor-pointer relative flex flex-col h-64"
-            >
-              <div className="relative h-40" onClick={() => onSelect(style)}>
-                <Image
-                  src={`${style.image}`}
-                  alt={`${style.clothingTitle} style placeholder`}
-                  fill
-                  className="object-cover transition-opacity group-hover:opacity-90"
-                />
+          {clothingStyles.map((style, index) => {
+            const imagePath = userData?.gender === "woman" ? style.womenImage : style.menImage;
+            
+            return (
+              <div
+                key={index}
+                className="group bg-gray-100 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg cursor-pointer relative flex flex-col h-64"
+              >
+                <div className="relative h-40" onClick={() => onSelect(style)}>
+                  <Image
+                    src={imagePath || ""}
+                    alt={`${style.clothingTitle} style placeholder`}
+                    fill
+                    className="object-cover transition-opacity group-hover:opacity-90"
+                  />
+                </div>
+                <div className="flex flex-col justify-between flex-grow p-3">
+                  <p className="text-mainBlack font-semibold text-sm line-clamp-2 mb-2">{style.clothingTitle}</p>
+                  <button
+                    className="w-full text-center bg-gray-200 text-gray-700 font-medium py-1.5 rounded text-sm hover:bg-gray-300 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelect(style);
+                    }}
+                  >
+                    Select
+                  </button>
+                </div>
               </div>
-              <div className="flex flex-col justify-between flex-grow p-3">
-                <p className="text-mainBlack font-semibold text-sm line-clamp-2 mb-2">{style.clothingTitle}</p>
-                <button
-                  className="w-full text-center bg-gray-200 text-gray-700 font-medium py-1.5 rounded text-sm hover:bg-gray-300 transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelect(style);
-                  }}
-                >
-                  Select
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
