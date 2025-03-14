@@ -10,10 +10,6 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 interface FormData {
   name: string;
   age: string;
-  ethnicity: string;
-  height: string;
-  bodyType: string;
-  eyeColor: string;
   gender: string;
 }
 
@@ -24,10 +20,6 @@ export default function Page() {
   const [formData, setFormData] = useState<FormData>({
     name: "",
     age: "",
-    ethnicity: "",
-    height: "",
-    bodyType: "",
-    eyeColor: "",
     gender: "",
   });
 
@@ -109,10 +101,10 @@ export default function Page() {
 
       <form onSubmit={handleSubmit} className="max-w-md mx-auto">
         <h1 className="text-[40px] font-bold text-mainBlack mb-4">
-          Tell us about yourself
+          Basic Information
         </h1>
         <p className="text-lg text-mainBlack mb-8">
-          This helps us generate photos that match your appearance.
+          Please provide your basic details to personalize your experience.
         </p>
 
         <div className="space-y-6">
@@ -152,92 +144,6 @@ export default function Page() {
               <option value="41-45 years">41-45 years</option>
               <option value="46-50 years">46-50 years</option>
               <option value="51+ years">51+ years</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="ethnicity" className="block text-lg font-medium text-mainBlack mb-2">
-              Ethnicity
-            </label>
-            <select
-              id="ethnicity"
-              name="ethnicity"
-              value={formData.ethnicity}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3 text-gray-900"
-            >
-              <option value="" className="text-gray-400">Select ethnicity</option>
-              <option value="Asian">Asian</option>
-              <option value="Black">Black</option>
-              <option value="Hispanic">Hispanic</option>
-              <option value="Middle Eastern">Middle Eastern</option>
-              <option value="White">White</option>
-              <option value="Mixed">Mixed</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="height" className="block text-lg font-medium text-mainBlack mb-2">
-              Height Range
-            </label>
-            <select
-              id="height"
-              name="height"
-              value={formData.height}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3 text-gray-900"
-            >
-              <option value="" className="text-gray-400">Select height range</option>
-              <option value="Less than 150 cm (Less than 4&apos;11&quot;)">Less than 150 cm (Less than 4&apos;11&quot;)</option>
-              <option value="151 - 160 cm (4&apos;11&quot; - 5&apos;3&quot;)">151 - 160 cm (4&apos;11&quot; - 5&apos;3&quot;)</option>
-              <option value="161 - 170 cm (5&apos;3&quot; - 5&apos;7&quot;)">161 - 170 cm (5&apos;3&quot; - 5&apos;7&quot;)</option>
-              <option value="171 - 180 cm (5&apos;7&quot; - 5&apos;11&quot;)">171 - 180 cm (5&apos;7&quot; - 5&apos;11&quot;)</option>
-              <option value="181 - 190 cm (5&apos;11&quot; - 6&apos;3&quot;)">181 - 190 cm (5&apos;11&quot; - 6&apos;3&quot;)</option>
-              <option value="More than 190 cm (More than 6&apos;3&quot;)">More than 190 cm (More than 6&apos;3&quot;)</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="bodyType" className="block text-lg font-medium text-mainBlack mb-2">
-              Body Type
-            </label>
-            <select
-              id="bodyType"
-              name="bodyType"
-              value={formData.bodyType}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3 text-gray-900"
-            >
-              <option value="" className="text-gray-400">Select body type</option>
-              <option value="Ectomorph (Lean)">Ectomorph (Lean)</option>
-              <option value="Mesomorph (Athletic)">Mesomorph (Athletic)</option>
-              <option value="Endomorph (Full)">Endomorph (Full)</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="eyeColor" className="block text-lg font-medium text-mainBlack mb-2">
-              Eye Color
-            </label>
-            <select
-              id="eyeColor"
-              name="eyeColor"
-              value={formData.eyeColor}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3 text-gray-900"
-            >
-              <option value="" className="text-gray-400">Select eye color</option>
-              <option value="Brown">Brown</option>
-              <option value="Blue">Blue</option>
-              <option value="Green">Green</option>
-              <option value="Hazel">Hazel</option>
-              <option value="Gray">Gray</option>
-              <option value="Other">Other</option>
             </select>
           </div>
 
