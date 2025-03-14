@@ -249,6 +249,192 @@
         "gender": ["man"]
       },
       {
+        "clothingTitle": "Yellow safety vest",
+        "clothingPrompt": "Professional yellow safety vest with reflective stripes",
+        "menImage": "/clothing/men/Yellow safety vest with reflective stripes.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "White pilot shirt",
+        "clothingPrompt": "Professional white pilot shirt with epaulets",
+        "menImage": "/clothing/men/White pilot shirt with epaulets.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "White chef's coat",
+        "clothingPrompt": "Professional white chef's coat with black trim",
+        "menImage": "/clothing/men/White chef's coat with black trim.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "White kandura",
+        "clothingPrompt": "Traditional white kandura with elegant draping",
+        "menImage": "/clothing/men/White kandura.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "White lab coat",
+        "clothingPrompt": "Professional white lab coat with black outfit underneath",
+        "menImage": "/clothing/men/White lab coat with black outfit.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Navy blue polo",
+        "clothingPrompt": "Casual navy blue short-sleeve polo shirt",
+        "menImage": "/clothing/men/Navy blue short-sleeve polo.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "White button-up shirt",
+        "clothingPrompt": "Classic white button-up shirt with clean lines",
+        "menImage": "/clothing/men/White button-up shirt.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Light gray textured sweatshirt",
+        "clothingPrompt": "Casual light gray textured sweatshirt with subtle pattern",
+        "menImage": "/clothing/men/Light gray textured sweatshirt.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Multicolored striped sweater",
+        "clothingPrompt": "Stylish multicolored striped sweater with modern design",
+        "menImage": "/clothing/men/Multicolored striped sweater.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Light gray ribbed turtleneck",
+        "clothingPrompt": "Sophisticated light gray ribbed turtleneck sweater",
+        "menImage": "/clothing/men/Light gray ribbed turtleneck.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Light gray blazer",
+        "clothingPrompt": "Professional light gray blazer with modern cut",
+        "menImage": "/clothing/men/Light gray blazer.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Light gray cardigan",
+        "clothingPrompt": "Casual light gray cardigan with comfortable fit",
+        "menImage": "/clothing/men/Light gray cardigan.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Light blue denim shirt",
+        "clothingPrompt": "Casual light blue denim shirt with classic styling",
+        "menImage": "/clothing/men/Light blue denim shirt.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Light blue short-sleeve button-down",
+        "clothingPrompt": "Fresh light blue short-sleeve button-down shirt",
+        "menImage": "/clothing/men/Light blue short-sleeve button-down.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Dark olive green blazer",
+        "clothingPrompt": "Sophisticated dark olive green blazer with tailored fit",
+        "menImage": "/clothing/men/Dark olive green blazer.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Fitted black turtleneck",
+        "clothingPrompt": "Sleek fitted black turtleneck shirt with modern style",
+        "menImage": "/clothing/men/Fitted black turtleneck shirt.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Light blue denim jacket",
+        "clothingPrompt": "Casual light blue denim jacket with classic design",
+        "menImage": "/clothing/men/Light blue denim jacket.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Dark gray patterned blazer",
+        "clothingPrompt": "Sophisticated dark gray patterned blazer with subtle texture",
+        "menImage": "/clothing/men/Dark gray patterned blazer.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Dark green blazer",
+        "clothingPrompt": "Professional dark green blazer with modern styling",
+        "menImage": "/clothing/men/Dark green blazer outfit.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Dark blue military uniform",
+        "clothingPrompt": "Professional dark blue military uniform with insignia",
+        "menImage": "/clothing/men/Dark blue military uniform.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Cream long-sleeve henley",
+        "clothingPrompt": "Casual cream long-sleeve henley with comfortable fit",
+        "menImage": "/clothing/men/Cream long-sleeve henley.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Cream short-sleeve polo",
+        "clothingPrompt": "Classic cream short-sleeve polo shirt",
+        "menImage": "/clothing/men/Cream short-sleeve polo.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Blue scrub set",
+        "clothingPrompt": "Professional blue medical scrub set",
+        "menImage": "/clothing/men/Blue scrub set.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Brown cable-knit turtleneck",
+        "clothingPrompt": "Cozy brown cable-knit turtleneck sweater",
+        "menImage": "/clothing/men/Brown cable-knit turtleneck.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Blue and white checked button-up",
+        "clothingPrompt": "Classic blue and white checked button-up shirt",
+        "menImage": "/clothing/men/Blue and white checked button-up.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Black tweed jacket",
+        "clothingPrompt": "Sophisticated black tweed jacket with texture",
+        "menImage": "/clothing/men/Black tweed jacket.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Black v-neck sweater",
+        "clothingPrompt": "Classic black v-neck sweater with clean lines",
+        "menImage": "/clothing/men/Black v-neck sweater.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Blue and orange plaid shirt",
+        "clothingPrompt": "Casual blue and orange plaid button-up shirt",
+        "menImage": "/clothing/men/Blue and orange plaid shirt.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Black graduation robe",
+        "clothingPrompt": "Traditional black graduation robe with formal styling",
+        "menImage": "/clothing/men/Black graduation robe.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Black relaxed-fit balloon sleeve top",
+        "clothingPrompt": "Modern black relaxed-fit top with balloon sleeves",
+        "menImage": "/clothing/men/Black relaxed-fit balloon sleeve top.jpg",
+        "gender": ["man"]
+      },
+      {
+        "clothingTitle": "Black and white striped polo",
+        "clothingPrompt": "Stylish black and white striped polo shirt",
+        "menImage": "/clothing/men/Black and white striped polo.jpg",
+        "gender": ["man"]
+      },
+      {
         "clothingTitle": "Pink v collar blouse",
         "clothingPrompt": "Professional pink v-neck blouse with elegant collar",
         "womenImage": "/clothing/women/Pink v collar blouse.jpg",
