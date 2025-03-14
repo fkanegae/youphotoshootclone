@@ -127,7 +127,7 @@ export default function Page() {
               value={formData.name}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3 text-gray-900 placeholder-gray-400"
               placeholder="Enter your name"
             />
           </div>
@@ -142,9 +142,9 @@ export default function Page() {
               value={formData.age}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3 text-gray-900"
             >
-              <option value="">Select age range</option>
+              <option value="" className="text-gray-400">Select age range</option>
               <option value="18-25 years">18-25 years</option>
               <option value="26-29 years">26-29 years</option>
               <option value="30-35 years">30-35 years</option>
@@ -165,9 +165,9 @@ export default function Page() {
               value={formData.ethnicity}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3 text-gray-900"
             >
-              <option value="">Select ethnicity</option>
+              <option value="" className="text-gray-400">Select ethnicity</option>
               <option value="Asian">Asian</option>
               <option value="Black">Black</option>
               <option value="Hispanic">Hispanic</option>
@@ -188,9 +188,9 @@ export default function Page() {
               value={formData.height}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3 text-gray-900"
             >
-              <option value="">Select height range</option>
+              <option value="" className="text-gray-400">Select height range</option>
               <option value="Less than 150 cm (Less than 4&apos;11&quot;)">Less than 150 cm (Less than 4&apos;11&quot;)</option>
               <option value="151 - 160 cm (4&apos;11&quot; - 5&apos;3&quot;)">151 - 160 cm (4&apos;11&quot; - 5&apos;3&quot;)</option>
               <option value="161 - 170 cm (5&apos;3&quot; - 5&apos;7&quot;)">161 - 170 cm (5&apos;3&quot; - 5&apos;7&quot;)</option>
@@ -210,9 +210,9 @@ export default function Page() {
               value={formData.bodyType}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3 text-gray-900"
             >
-              <option value="">Select body type</option>
+              <option value="" className="text-gray-400">Select body type</option>
               <option value="Ectomorph (Lean)">Ectomorph (Lean)</option>
               <option value="Mesomorph (Athletic)">Mesomorph (Athletic)</option>
               <option value="Endomorph (Full)">Endomorph (Full)</option>
@@ -229,9 +229,9 @@ export default function Page() {
               value={formData.eyeColor}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3 text-gray-900"
             >
-              <option value="">Select eye color</option>
+              <option value="" className="text-gray-400">Select eye color</option>
               <option value="Brown">Brown</option>
               <option value="Blue">Blue</option>
               <option value="Green">Green</option>
@@ -251,9 +251,9 @@ export default function Page() {
               value={formData.gender}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange text-base py-2 px-3 text-gray-900"
             >
-              <option value="">Select gender</option>
+              <option value="" className="text-gray-400">Select gender</option>
               <option value="man">Man</option>
               <option value="woman">Woman</option>
             </select>
@@ -262,7 +262,7 @@ export default function Page() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-mainYellow text-mainBlack font-semibold py-3 px-4 rounded-md hover:bg-mainYellow/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mainYellow mt-8"
+            className="w-full bg-gradient-to-r from-mainOrange to-mainGreen text-white font-semibold py-3 px-4 rounded-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mainOrange mt-8 transition-all duration-200"
           >
             {isLoading ? "Saving..." : "Continue"}
           </button>
