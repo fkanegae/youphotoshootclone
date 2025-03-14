@@ -5,15 +5,22 @@ import Image from "next/image";
 import ClothingStyleModal from "./ClothingStyleModal";
 import styleData from "./styleData.json";
 import { updateStyles } from "@/action/updateStyles";
+import getUser from "@/action/getUser";
+
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 interface BackgroundStyle {
   backgroundTitle: string;
   backgroundPrompt: string;
+  image: string;
+  womenImage: string;
+  gender?: string; // Add gender to background style
 }
 
 interface ClothingStyle {
   clothingTitle: string;
   clothingPrompt: string;
+  gender: string[];
 }
 
 type StyleObject = BackgroundStyle | ClothingStyle;
@@ -23,6 +30,8 @@ type StyleObject = BackgroundStyle | ClothingStyle;
  * Allows users to select up to 6 styles for their headshots.
  */
 export default function Page() {
+  // State for storing user data
+  const [userData, setUserData] = useState<any>(null);
   // Update the state type
   const [selectedStyles, setSelectedStyles] = useState<StyleObject[]>([]);
   // State for controlling the visibility of the clothing style modal
@@ -32,6 +41,29 @@ export default function Page() {
     useState<StyleObject | null>(null);
   // State for tracking processing status
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (isDevelopment) {
+        // Use mock data in development
+        setUserData({
+          gender: "woman", // or "man" - change this to test different genders
+          // Add other mock data as needed
+        });
+        return;
+      }
+
+      const data = await getUser();
+      setUserData(data?.[0]);
+    };
+    fetchUserData();
+  }, []);
+
+  // Filter clothing styles based on user's gender
+  const filteredClothingStyles = styleData.clothingStyles.filter(
+    (style) => !userData?.gender || style.gender.includes(userData.gender)
+  );
 
   // Add this new function to check if a style is already selected
   const isStyleSelected = (backgroundStyle: StyleObject) => {
@@ -91,8 +123,8 @@ export default function Page() {
           Math.floor(Math.random() * styleData.backgroundStyles.length)
         ];
       const randomClothingStyle =
-        styleData.clothingStyles[
-          Math.floor(Math.random() * styleData.clothingStyles.length)
+        filteredClothingStyles[
+          Math.floor(Math.random() * filteredClothingStyles.length)
         ];
       newStyles.push({
         backgroundTitle: randomBackgroundStyle.backgroundTitle,
@@ -105,34 +137,50 @@ export default function Page() {
     setSelectedStyles([...selectedStyles, ...newStyles]);
   };
 
-  // Update preselectedStyles to use StyleObject
-  const preselectedStyles: StyleObject[] = [
-    {
-      backgroundTitle: "Garden",
-      backgroundPrompt: "Lush garden with colorful flowers and green foliage",
-      clothingTitle: "White buttoned shirt",
-      clothingPrompt: "Person wearing a white buttoned shirt",
-    },
-    {
-      backgroundTitle: "Office",
-      backgroundPrompt: "Modern office setting with a desk and computer",
-      clothingTitle: "Black sweater",
-      clothingPrompt: "Person wearing a black sweater",
-    },
-    {
-      backgroundTitle: "Grey",
-      backgroundPrompt: "Neutral grey background",
-      clothingTitle: "Light gray suit jacket over a white dress shirt",
-      clothingPrompt:
-        "Person wearing a light gray suit jacket over a white dress shirt",
-    },
-    {
-      backgroundTitle: "Outdoors",
-      backgroundPrompt: "Outdoor scene with trees and a path",
-      clothingTitle: "Black sweater",
-      clothingPrompt: "Person wearing a black sweater",
-    },
-  ];
+  // Get gender-specific preselected styles
+  const getPreselectedStyles = () => {
+    if (!userData?.gender) return [];
+
+    const commonStyles = [
+      {
+        backgroundTitle: "Garden",
+        backgroundPrompt: "Lush garden with colorful flowers and green foliage",
+        clothingTitle: userData.gender === "woman" ? "White blouse with bow" : "White button-up shirt",
+        clothingPrompt: userData.gender === "woman" 
+          ? "Elegant white blouse with feminine bow detail"
+          : "Clean, classic white button-up shirt",
+      },
+      {
+        backgroundTitle: "Office",
+        backgroundPrompt: "Modern office setting with a desk and computer",
+        clothingTitle: userData.gender === "woman" ? "Navy structured dress" : "Dark blue tailored suit",
+        clothingPrompt: userData.gender === "woman"
+          ? "Professional navy structured dress with subtle details"
+          : "Executive wearing an elegant dark blue tailored suit",
+      },
+      {
+        backgroundTitle: "Grey",
+        backgroundPrompt: "Neutral grey background",
+        clothingTitle: userData.gender === "woman" ? "Black fitted blazer" : "Light gray suit ensemble",
+        clothingPrompt: userData.gender === "woman"
+          ? "Professional black fitted blazer with feminine cut"
+          : "Light gray suit ensemble with matching tie",
+      },
+      {
+        backgroundTitle: "Outdoors",
+        backgroundPrompt: "Outdoor scene with trees and a path",
+        clothingTitle: userData.gender === "woman" ? "Cream silk blouse" : "Black v-neck sweater",
+        clothingPrompt: userData.gender === "woman"
+          ? "Luxurious cream silk blouse with subtle draping"
+          : "Casual black v-neck sweater with subtle texture",
+      },
+    ];
+
+    return commonStyles;
+  };
+
+  // Update preselectedStyles to use gender-specific styles
+  const preselectedStyles = getPreselectedStyles();
 
   // Update handleContinue to use the new structure
   const handleContinue = async () => {
@@ -187,7 +235,7 @@ export default function Page() {
           <div className="lg:w-2/3">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-mainBlack">
-                Portrait styles (for all genders)
+                Portrait styles {userData?.gender === "woman" ? "for women" : "for men"}
               </h2>
               <button
                 className={`font-medium px-4 py-2 rounded transition-colors ${
@@ -207,59 +255,65 @@ export default function Page() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {styleData.backgroundStyles.map((style, index) => (
-                <div
-                  key={index}
-                  className={`group bg-gray-100 rounded-lg shadow-md overflow-hidden transition-shadow ${
-                    isStyleSelected(style)
-                      ? "opacity-50 cursor-not-allowed"
-                      : "hover:shadow-lg cursor-pointer"
-                  } relative`}
-                >
-                  {index < 3 && (
-                    <div className="absolute top-2 right-2 bg-gradient-to-r from-mainOrange to-mainGreen text-mainBlack text-xs font-bold px-2 py-1 rounded-full z-10 animate-gradient bg-[length:200%_200%]">
-                      Popular
-                    </div>
-                  )}
+              {styleData.backgroundStyles.map((style, index) => {
+                // Construct the gender-specific image path
+                const genderPath = userData?.gender === "woman" ? "women" : "men";
+                const imagePath = style.image.replace("/background/", `/background/${genderPath}/`);
+                
+                return (
                   <div
-                    className="relative"
-                    onClick={() =>
-                      !isStyleSelected(style) && handleCardClick(style)
-                    }
+                    key={index}
+                    className={`group bg-gray-100 rounded-lg shadow-md overflow-hidden transition-shadow ${
+                      isStyleSelected(style)
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:shadow-lg cursor-pointer"
+                    } relative`}
                   >
-                    <Image
-                      src={`${style.image}`}
-                      alt={`${style.backgroundTitle} style placeholder`}
-                      width={200}
-                      height={200}
-                      className="w-full h-40 object-cover transition-opacity group-hover:opacity-90"
-                    />
-                    <div className="p-3">
-                      <p className="text-mainBlack font-semibold text-sm mb-2">
-                        {style.backgroundTitle}
-                      </p>
+                    {index < 3 && (
+                      <div className="absolute top-2 right-2 bg-gradient-to-r from-mainOrange to-mainGreen text-mainBlack text-xs font-bold px-2 py-1 rounded-full z-10 animate-gradient bg-[length:200%_200%]">
+                        Popular
+                      </div>
+                    )}
+                    <div
+                      className="relative"
+                      onClick={() =>
+                        !isStyleSelected(style) && handleCardClick(style)
+                      }
+                    >
+                      <Image
+                        src={userData?.gender === "woman" ? style.womenImage : style.image}
+                        alt={`${style.backgroundTitle} style placeholder`}
+                        width={200}
+                        height={200}
+                        className="w-full h-40 object-cover transition-opacity group-hover:opacity-90"
+                      />
+                      <div className="p-3">
+                        <p className="text-mainBlack font-semibold text-sm mb-2">
+                          {style.backgroundTitle}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="px-3 pb-3">
+                      <button
+                        className={`w-full text-center font-medium py-1.5 rounded text-sm transition-colors ${
+                          isStyleSelected(style)
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!isStyleSelected(style)) {
+                            handleCardClick(style);
+                          }
+                        }}
+                        disabled={isStyleSelected(style)}
+                      >
+                        {isStyleSelected(style) ? "Selected" : "Select +"}
+                      </button>
                     </div>
                   </div>
-                  <div className="px-3 pb-3">
-                    <button
-                      className={`w-full text-center font-medium py-1.5 rounded text-sm transition-colors ${
-                        isStyleSelected(style)
-                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (!isStyleSelected(style)) {
-                          handleCardClick(style);
-                        }
-                      }}
-                      disabled={isStyleSelected(style)}
-                    >
-                      {isStyleSelected(style) ? "Selected" : "Select +"}
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -366,7 +420,7 @@ export default function Page() {
         onSelect={(clothingStyle) =>
           handleSelectClick(currentBackgroundStyle!, clothingStyle)
         }
-        clothingStyles={styleData.clothingStyles}
+        clothingStyles={filteredClothingStyles}
       />
     </div>
   );

@@ -185,187 +185,194 @@
       {
         "clothingTitle": "Fitted black turtleneck shirt",
         "clothingPrompt": "Sleek, fitted black turtleneck shirt",
-        "image": "/clothing/Fitted black turtleneck shirt.jpg"
+        "image": "/clothing/Fitted black turtleneck shirt.jpg",
+        "gender": ["man", "woman"]
       },
       {
         "clothingTitle": "Navy blazer with light blue shirt",
         "clothingPrompt": "Navy blazer over a light blue dress shirt, business attire",
-        "image": "/clothing/Navy blazer with light blue shirt.jpg"
+        "image": "/clothing/Navy blazer with light blue shirt.jpg",
+        "gender": ["man"]
       },
       {
         "clothingTitle": "Dark blue tailored suit",
         "clothingPrompt": "Executive wearing an elegant dark blue tailored suit",
-        "image": "/clothing/Dark blue tailored suit.jpg"
+        "image": "/clothing/Dark blue tailored suit.jpg",
+        "gender": ["man"]
       },
       {
         "clothingTitle": "Light gray suit ensemble",
         "clothingPrompt": "Light gray suit ensemble with matching tie",
-        "image": "/clothing/Light gray suit ensemble.jpg"
+        "image": "/clothing/Light gray suit ensemble.jpg",
+        "gender": ["man"]
       },
       {
         "clothingTitle": "White button-up shirt",
         "clothingPrompt": "Clean, classic white button-up shirt",
-        "image": "/clothing/White button-up shirt.jpg"
+        "image": "/clothing/White button-up shirt.jpg",
+        "gender": ["man", "woman"]
       },
       {
         "clothingTitle": "Dark gray patterned blazer",
         "clothingPrompt": "Professional dark gray patterned blazer with matching trousers",
-        "image": "/clothing/Dark gray patterned blazer.jpg"
+        "image": "/clothing/Dark gray patterned blazer.jpg",
+        "gender": ["man", "woman"]
       },
       {
         "clothingTitle": "Blue scrub set",
         "clothingPrompt": "Medical blue scrub set with white accents",
-        "image": "/clothing/Blue scrub set.jpg"
+        "image": "/clothing/Blue scrub set.jpg",
+        "gender": ["man", "woman"]
       },
       {
         "clothingTitle": "White lab coat with black outfit",
         "clothingPrompt": "Scientific white lab coat with black trousers and accessories",
-        "image": "/clothing/White lab coat with black outfit.jpg"
+        "image": "/clothing/White lab coat with black outfit.jpg",
+        "gender": ["man", "woman"]
       },
       {
         "clothingTitle": "Black v-neck sweater",
         "clothingPrompt": "Casual black v-neck sweater with subtle texture",
-        "image": "/clothing/Black v-neck sweater.jpg"
+        "image": "/clothing/Black v-neck sweater.jpg",
+        "gender": ["man", "woman"]
       },
       {
         "clothingTitle": "Black long-sleeve button-up shirt",
         "clothingPrompt": "Classic black long-sleeve button-up shirt with subtle texture",
-        "image": "/clothing/Black long-sleeve button-up shirt.jpg"
+        "image": "/clothing/Black long-sleeve button-up shirt.jpg",
+        "gender": ["man"]
       },
       {
         "clothingTitle": "White t-shirt and black trousers",
         "clothingPrompt": "Simple white t-shirt with black trousers and sneakers",
-        "image": "/clothing/White t-shirt and black trousers.jpg"
+        "image": "/clothing/White t-shirt and black trousers.jpg",
+        "gender": ["man"]
       },
       {
         "clothingTitle": "Black and white striped polo",
         "clothingPrompt": "Classic black and white striped polo with subtle texture",
-        "image": "/clothing/Black and white striped polo.jpg"
+        "image": "/clothing/Black and white striped polo.jpg",
+        "gender": ["man"]
       },
       {
         "clothingTitle": "Light blue short-sleeve button-down",
         "clothingPrompt": "Casual light blue short-sleeve button-down with subtle texture",
-        "image": "/clothing/Light blue short-sleeve button-down.jpg"
-      },
-      {
-        "clothingTitle": "Black relaxed-fit balloon sleeve top",
-        "clothingPrompt": "Casual black relaxed-fit balloon sleeve top with subtle texture",
-        "image": "/clothing/Black relaxed-fit balloon sleeve top.jpg"
-      },
-      {
-        "clothingTitle": "Light gray cardigan",
-        "clothingPrompt": "Classic light gray cardigan with subtle texture",
-        "image": "/clothing/Light gray cardigan.jpg"
-      },
-      {
-        "clothingTitle": "Light blue denim jacket",
-        "clothingPrompt": "Casual light blue denim jacket with subtle texture",
-        "image": "/clothing/Light blue denim jacket.jpg"
-      },
-      {
-        "clothingTitle": "Black tweed jacket",
-        "clothingPrompt": "Classic black tweed jacket with subtle texture",
-        "image": "/clothing/Black tweed jacket.jpg"
-      },
-      {
-        "clothingTitle": "Cream long-sleeve henley",
-        "clothingPrompt": "Casual cream long-sleeve henley with subtle texture",
-        "image": "/clothing/Cream long-sleeve henley.jpg"
+        "image": "/clothing/Light blue short-sleeve button-down.jpg",
+        "gender": ["man"]
       },
       {
         "clothingTitle": "Navy blue short-sleeve polo",
         "clothingPrompt": "Professional navy blue short-sleeve polo with subtle texture",
-        "image": "/clothing/Navy blue short-sleeve polo.jpg"
+        "image": "/clothing/Navy blue short-sleeve polo.jpg",
+        "gender": ["man"]
       },
       {
         "clothingTitle": "Cream short-sleeve polo",
         "clothingPrompt": "Casual cream short-sleeve polo with subtle texture",
-        "image": "/clothing/Cream short-sleeve polo.jpg"
+        "image": "/clothing/Cream short-sleeve polo.jpg",
+        "gender": ["man"]
       },
       {
         "clothingTitle": "Light gray blazer",
         "clothingPrompt": "Professional light gray blazer with subtle texture",
-        "image": "/clothing/Light gray blazer.jpg"
+        "image": "/clothing/Light gray blazer.jpg",
+        "gender": ["man", "woman"]
       },
       {
         "clothingTitle": "Light blue denim shirt",
         "clothingPrompt": "Casual light blue denim shirt with subtle texture",
-        "image": "/clothing/Light blue denim shirt.jpg"
+        "image": "/clothing/Light blue denim shirt.jpg",
+        "gender": ["man"]
       },
       {
         "clothingTitle": "Blue and white checked button-up",
         "clothingPrompt": "Classic blue and white checked button-up with subtle texture",
-        "image": "/clothing/Blue and white checked button-up.jpg"
+        "image": "/clothing/Blue and white checked button-up.jpg",
+        "gender": ["man"]
       },
       {
         "clothingTitle": "Light gray ribbed turtleneck",
         "clothingPrompt": "Casual light gray ribbed turtleneck with subtle texture",
-        "image": "/clothing/Light gray ribbed turtleneck.jpg"
+        "image": "/clothing/Light gray ribbed turtleneck.jpg",
+        "gender": ["man", "woman"]
       },
       {
         "clothingTitle": "Blue and orange plaid shirt",
         "clothingPrompt": "Classic blue and orange plaid shirt with subtle texture",
-        "image": "/clothing/Blue and orange plaid shirt.jpg"
+        "image": "/clothing/Blue and orange plaid shirt.jpg",
+        "gender": ["man"]
       },
       {
         "clothingTitle": "Dark green blazer outfit",
         "clothingPrompt": "Professional dark green blazer outfit with subtle texture",
-        "image": "/clothing/Dark green blazer outfit.jpg"
+        "image": "/clothing/Dark green blazer outfit.jpg",
+        "gender": ["man", "woman"]
       },
       {
         "clothingTitle": "Multicolored striped sweater",
         "clothingPrompt": "Casual multicolored striped sweater with subtle texture",
-        "image": "/clothing/Multicolored striped sweater.jpg"
+        "image": "/clothing/Multicolored striped sweater.jpg",
+        "gender": ["man", "woman"]
       },
       {
-        "clothingTitle": "Light gray textured sweatshirt",
-        "clothingPrompt": "Casual light gray textured sweatshirt with subtle texture",
-        "image": "/clothing/Light gray textured sweatshirt.jpg"
+        "clothingTitle": "Elegant black blazer dress",
+        "clothingPrompt": "Professional black blazer dress with feminine cut",
+        "image": "/clothing/Elegant black blazer dress.jpg",
+        "gender": ["woman"]
       },
       {
-        "clothingTitle": "Black graduation robe",
-        "clothingPrompt": "Formal black graduation robe with subtle texture",
-        "image": "/clothing/Black graduation robe.jpg"
+        "clothingTitle": "Navy pencil dress",
+        "clothingPrompt": "Classic navy pencil dress with subtle details",
+        "image": "/clothing/Navy pencil dress.jpg",
+        "gender": ["woman"]
       },
       {
-        "clothingTitle": "White chef's coat with black trim",
-        "clothingPrompt": "Professional white chef's coat with black trim and subtle texture",
-        "image": "/clothing/White chef's coat with black trim.jpg"
+        "clothingTitle": "White blouse with bow",
+        "clothingPrompt": "Elegant white blouse with feminine bow detail",
+        "image": "/clothing/White blouse with bow.jpg",
+        "gender": ["woman"]
       },
       {
-        "clothingTitle": "Yellow safety vest with reflective stripes",
-        "clothingPrompt": "Safety yellow vest with reflective stripes and subtle texture",
-        "image": "/clothing/Yellow safety vest with reflective stripes.jpg"
+        "clothingTitle": "Cream silk blouse",
+        "clothingPrompt": "Luxurious cream silk blouse with subtle draping",
+        "image": "/clothing/Cream silk blouse.jpg",
+        "gender": ["woman"]
       },
       {
-        "clothingTitle": "White pilot shirt with epaulets",
-        "clothingPrompt": "Professional white pilot shirt with epaulets and subtle texture",
-        "image": "/clothing/White pilot shirt with epaulets.jpg"
+        "clothingTitle": "Black fitted blazer",
+        "clothingPrompt": "Professional black fitted blazer with feminine cut",
+        "image": "/clothing/Black fitted blazer.jpg",
+        "gender": ["woman"]
       },
       {
-        "clothingTitle": "White kandura",
-        "clothingPrompt": "Traditional white kandura with subtle texture",
-        "image": "/clothing/White kandura.jpg"
+        "clothingTitle": "Light blue wrap blouse",
+        "clothingPrompt": "Elegant light blue wrap blouse with feminine draping",
+        "image": "/clothing/Light blue wrap blouse.jpg",
+        "gender": ["woman"]
       },
       {
-        "clothingTitle": "Light cream graphic hoodie",
-        "clothingPrompt": "Casual light cream graphic hoodie with subtle texture",
-        "image": "/clothing/Light cream graphic hoodie.jpg"
+        "clothingTitle": "Navy structured dress",
+        "clothingPrompt": "Professional navy structured dress with subtle details",
+        "image": "/clothing/Navy structured dress.jpg",
+        "gender": ["woman"]
       },
       {
-        "clothingTitle": "Brown cable-knit turtleneck",
-        "clothingPrompt": "Casual brown cable-knit turtleneck with subtle texture",
-        "image": "/clothing/Brown cable-knit turtleneck.jpg"
+        "clothingTitle": "Burgundy knit sweater",
+        "clothingPrompt": "Cozy burgundy knit sweater with feminine fit",
+        "image": "/clothing/Burgundy knit sweater.jpg",
+        "gender": ["woman"]
       },
       {
-        "clothingTitle": "Dark olive green blazer",
-        "clothingPrompt": "Professional dark olive green blazer with subtle texture",
-        "image": "/clothing/Dark olive green blazer.jpg"
+        "clothingTitle": "Gray tweed blazer",
+        "clothingPrompt": "Classic gray tweed blazer with feminine cut",
+        "image": "/clothing/Gray tweed blazer.jpg",
+        "gender": ["woman"]
       },
       {
-        "clothingTitle": "Dark blue military uniform",
-        "clothingPrompt": "Formal dark blue military uniform with insignia and subtle texture",
-        "image": "/clothing/Dark blue military uniform.jpg"
+        "clothingTitle": "White sleeveless blouse",
+        "clothingPrompt": "Elegant white sleeveless blouse with subtle details",
+        "image": "/clothing/White sleeveless blouse.jpg",
+        "gender": ["woman"]
       }
     ]
   }

@@ -3,6 +3,9 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { updateUser } from "@/action/updateUser";
+import { createClient } from "@/utils/supabase/client";
+
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 interface FormData {
   name: string;
@@ -16,6 +19,8 @@ interface FormData {
 
 export default function Page() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     age: "",
@@ -25,75 +30,73 @@ export default function Page() {
     eyeColor: "",
     gender: "",
   });
-  const [isFormValid, setIsFormValid] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    if (name === 'gender') {
-      setFormData((prev) => ({ ...prev, [name]: value === 'Male' ? 'man' : 'woman' }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleEyeColorChange = (color: string) => {
-    setFormData((prev) => ({ ...prev, eyeColor: color }));
-  };
-
-  const getEyeColorClass = (color: string) => {
-    const colorMap: { [key: string]: string } = {
-      "Hazel": "bg-amber-500",
-      "Gray": "bg-gray-400",
-      "Light brown": "bg-amber-600",
-      "Blue": "bg-blue-500",
-      "Green": "bg-green-500",
-      "Dark brown": "bg-amber-900",
-    };
-    return colorMap[color] || "bg-gray-300";
-  };
 
   useEffect(() => {
-    const isValid = Object.values(formData).every((value) => value !== "");
-    setIsFormValid(isValid);
-  }, [formData]);
-
-  const handleSubmit = async () => {
-    if (isFormValid && !isSubmitting) {
-      setIsSubmitting(true);
-      try {
-        const result = await updateUser(formData);
-        if (result && result.error) {
-          // Show error message to the user
-          alert("An error occurred. Please try again.");
-        }
-        // No need for else case as updateUser will redirect on success
-      } catch (error) {
-        console.error("Error submitting form:", error);
-        alert("An unexpected error occurred. Please try again.");
-      } finally {
-        setIsSubmitting(false);
+    const checkAuth = async () => {
+      if (isDevelopment) {
+        return;
       }
+
+      const supabase = createClient();
+      const { data: { user }, error } = await supabase.auth.getUser();
+      
+      if (error || !user) {
+        router.push('/login');
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await updateUser(formData);
+      // The updateUser action will handle the redirect
+    } catch (error) {
+      setError("Failed to update user information. Please try again.");
+      console.error("Error updating user:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-mainWhite p-4">
+        <div className="max-w-md mx-auto mt-8 p-4 bg-red-50 rounded-lg">
+          <p className="text-red-600">{error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-mainWhite min-h-screen p-4 pt-8 md:pt-16 text-center">
-      {/* 5-step progress bar */}
+    <div className="min-h-screen bg-mainWhite p-4">
       <div className="max-w-[240px] mx-auto mb-5">
         <div className="flex justify-between items-center gap-2">
           {[1, 2, 3, 4, 5].map((step) => (
             <div key={step} className="flex-1">
               <div
                 className={`h-2 rounded-full ${
-                  step <= 3
+                  step <= 2
                     ? "bg-gradient-to-r from-mainOrange to-mainGreen animate-gradient bg-[length:200%_200%]"
                     : "bg-gray-200"
                 }`}
@@ -101,234 +104,171 @@ export default function Page() {
             </div>
           ))}
         </div>
-        <p className="text-[11px] text-mainBlack mt-2">Step 3 of 5</p>
+        <p className="text-[11px] text-mainBlack mt-2">Step 2 of 5</p>
       </div>
 
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-mainBlack mb-2 max-w-2xl mx-auto">
-          Add your personal info
+      <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-6">
+        <h1 className="text-4xl font-bold text-mainBlack mb-2">
+          Tell us about yourself
         </h1>
-        <p className="text-md text-mainBlack mb-8 max-w-xl mx-auto">
-          This information will help guide our AI towards creating headshots
-          that look like you. It will be deleted after your headshots are
-          completed.
+        <p className="text-lg text-mainBlack mb-8">
+          This helps us generate photos that match your appearance.
         </p>
 
-        <form className="max-w-md mx-auto text-left">
-          {/* Name input */}
-          <div className="mb-4">
-            <label htmlFor="name" className="block text-mainBlack mb-2">
-              Name *
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              Name
             </label>
             <input
               type="text"
               id="name"
               name="name"
-              required
               value={formData.name}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-mainBlack rounded bg-mainWhite text-mainBlack"
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
             />
           </div>
 
-          {/* Age select */}
-          <div className="mb-4">
-            <label htmlFor="age" className="block text-mainBlack mb-2">
-              Age *
+          <div>
+            <label htmlFor="age" className="block text-sm font-medium text-gray-700">
+              Age Range
             </label>
             <select
               id="age"
               name="age"
-              required
               value={formData.age}
-              onChange={handleSelectChange}
-              className="w-full p-2 border border-mainBlack rounded bg-mainWhite text-mainBlack"
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
             >
-              <option value="">Select your age</option>
-              {[
-                "12-18 years",
-                "19-25 years",
-                "26-29 years",
-                "30-35 years",
-                "36-45 years",
-                "46-55 years",
-                "56-65 years",
-                "66-75 years",
-                "76+ years",
-              ].map((age) => (
-                <option key={age} value={age}>
-                  {age}
-                </option>
-              ))}
+              <option value="">Select age range</option>
+              <option value="18-25 years">18-25 years</option>
+              <option value="26-29 years">26-29 years</option>
+              <option value="30-35 years">30-35 years</option>
+              <option value="36-40 years">36-40 years</option>
+              <option value="41-45 years">41-45 years</option>
+              <option value="46-50 years">46-50 years</option>
+              <option value="51+ years">51+ years</option>
             </select>
           </div>
 
-          {/* Ethnicity select */}
-          <div className="mb-4">
-            <label htmlFor="ethnicity" className="block text-mainBlack mb-2">
-              Ethnicity *
+          <div>
+            <label htmlFor="ethnicity" className="block text-sm font-medium text-gray-700">
+              Ethnicity
             </label>
             <select
               id="ethnicity"
               name="ethnicity"
-              required
               value={formData.ethnicity}
-              onChange={handleSelectChange}
-              className="w-full p-2 border border-mainBlack rounded bg-mainWhite text-mainBlack"
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
             >
-              <option value="">Select your ethnicity</option>
-              {[
-                "African",
-                "Arabic",
-                "Asian",
-                "Black or African American",
-                "Caribbean",
-                "Indian",
-                "Melanesian",
-                "Polynesian",
-                "European",
-                "Caucasian",
-                "Latin American",
-                "Hispanic",
-                "Other",
-              ].map((ethnicity) => (
-                <option key={ethnicity} value={ethnicity}>
-                  {ethnicity}
-                </option>
-              ))}
+              <option value="">Select ethnicity</option>
+              <option value="Asian">Asian</option>
+              <option value="Black">Black</option>
+              <option value="Hispanic">Hispanic</option>
+              <option value="Middle Eastern">Middle Eastern</option>
+              <option value="White">White</option>
+              <option value="Mixed">Mixed</option>
+              <option value="Other">Other</option>
             </select>
           </div>
 
-          {/* Height select */}
-          <div className="mb-4">
-            <label htmlFor="height" className="block text-mainBlack mb-2">
-              Height *
+          <div>
+            <label htmlFor="height" className="block text-sm font-medium text-gray-700">
+              Height Range
             </label>
             <select
               id="height"
               name="height"
-              required
               value={formData.height}
-              onChange={handleSelectChange}
-              className="w-full p-2 border border-mainBlack rounded bg-mainWhite text-mainBlack"
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
             >
-              <option value="">Select your height</option>
-              {[
-                "< 150 cm (4'11\")",
-                "150 - 160 cm (4'11\" - 5'3\")",
-                "161 - 170 cm (5'3\" - 5'7\")",
-                "171 - 180 cm (5'7\" - 5'11\")",
-                "181 - 190 cm (5'11\" - 6'3\")",
-                "≥ 190 cm (6'3\"+)",
-              ].map((height) => (
-                <option key={height} value={height}>
-                  {height}
-                </option>
-              ))}
+              <option value="">Select height range</option>
+              <option value="Less than 150 cm (Less than 4'11&quot;)">Less than 150 cm (Less than 4'11")</option>
+              <option value="151 - 160 cm (4'11&quot; - 5'3&quot;)">151 - 160 cm (4'11" - 5'3")</option>
+              <option value="161 - 170 cm (5'3&quot; - 5'7&quot;)">161 - 170 cm (5'3" - 5'7")</option>
+              <option value="171 - 180 cm (5'7&quot; - 5'11&quot;)">171 - 180 cm (5'7" - 5'11")</option>
+              <option value="181 - 190 cm (5'11&quot; - 6'3&quot;)">181 - 190 cm (5'11" - 6'3")</option>
+              <option value="More than 190 cm (More than 6'3&quot;)">More than 190 cm (More than 6'3")</option>
             </select>
           </div>
 
-          {/* Body Type select */}
-          <div className="mb-4">
-            <label htmlFor="bodyType" className="block text-mainBlack mb-2">
-              Body Type *
+          <div>
+            <label htmlFor="bodyType" className="block text-sm font-medium text-gray-700">
+              Body Type
             </label>
             <select
               id="bodyType"
               name="bodyType"
-              required
               value={formData.bodyType}
-              onChange={handleSelectChange}
-              className="w-full p-2 border border-mainBlack rounded bg-mainWhite text-mainBlack"
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
             >
-              <option value="">Select your body type</option>
-              {[
-                "Ectomorph (Slim)",
-                "Mesomorph (Athletic)",
-                "Endomorph (Full)",
-              ].map((bodyType) => (
-                <option key={bodyType} value={bodyType}>
-                  {bodyType}
-                </option>
-              ))}
+              <option value="">Select body type</option>
+              <option value="Ectomorph (Lean)">Ectomorph (Lean)</option>
+              <option value="Mesomorph (Athletic)">Mesomorph (Athletic)</option>
+              <option value="Endomorph (Full)">Endomorph (Full)</option>
             </select>
           </div>
 
-          {/* Eye Color buttons */}
-          <div className="mb-4">
-            <label className="block text-mainBlack mb-2">Eye Color *</label>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                "Hazel",
-                "Gray",
-                "Light brown",
-                "Blue",
-                "Green",
-                "Dark brown",
-              ].map((eyeColor) => (
-                <button
-                  key={eyeColor}
-                  type="button"
-                  onClick={() => handleEyeColorChange(eyeColor)}
-                  className={`flex items-center justify-start p-2 border ${
-                    formData.eyeColor === eyeColor
-                      ? "border-mainOrange bg-mainOrange/10"
-                      : "border-mainBlack bg-mainWhite"
-                  } rounded text-mainBlack hover:bg-opacity-90 transition-colors`}
-                >
-                  <div
-                    className={`w-6 h-6 rounded-full mr-2 ${getEyeColorClass(
-                      eyeColor
-                    )} ${
-                      formData.eyeColor === eyeColor
-                        ? "ring-2 ring-mainOrange"
-                        : ""
-                    }`}
-                  ></div>
-                  <span>{eyeColor}</span>
-                </button>
-              ))}
-            </div>
+          <div>
+            <label htmlFor="eyeColor" className="block text-sm font-medium text-gray-700">
+              Eye Color
+            </label>
+            <select
+              id="eyeColor"
+              name="eyeColor"
+              value={formData.eyeColor}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
+            >
+              <option value="">Select eye color</option>
+              <option value="Brown">Brown</option>
+              <option value="Blue">Blue</option>
+              <option value="Green">Green</option>
+              <option value="Hazel">Hazel</option>
+              <option value="Gray">Gray</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
 
-          {/* Gender radio buttons */}
-          <div className="mb-4">
-            <label className="block text-mainBlack mb-2">Gender *</label>
-            <div className="flex gap-4">
-              {["Male", "Female"].map((gender) => (
-                <label
-                  key={gender}
-                  className="flex items-center text-mainBlack"
-                >
-                  <input
-                    type="radio"
-                    name="gender"
-                    value={gender}
-                    required
-                    checked={formData.gender === (gender === 'Male' ? 'man' : 'woman')}
-                    onChange={handleInputChange}
-                    className="mr-2"
-                  />
-                  {gender}
-                </label>
-              ))}
-            </div>
+          <div>
+            <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+              Gender
+            </label>
+            <select
+              id="gender"
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
+            >
+              <option value="">Select gender</option>
+              <option value="woman">Woman</option>
+              <option value="man">Man</option>
+            </select>
           </div>
+        </div>
 
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className={`bg-mainOrange text-mainBlack py-3 px-6 rounded-full font-semibold transition-colors inline-block ${
-              isFormValid && !isSubmitting
-                ? "hover:bg-opacity-90"
-                : "opacity-50 cursor-not-allowed"
-            }`}
-            disabled={!isFormValid || isSubmitting}
-          >
-            {isSubmitting ? "Processing..." : "Next →"}
-          </button>
-        </form>
-      </div>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-mainOrange hover:bg-mainOrange-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mainOrange ${
+            isLoading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          {isLoading ? "Saving..." : "Continue"}
+        </button>
+      </form>
     </div>
   );
 }
