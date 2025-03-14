@@ -190,12 +190,12 @@ export default function Page() {
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-mainOrange focus:ring-mainOrange sm:text-sm"
             >
               <option value="">Select height range</option>
-              <option value="Less than 150 cm (Less than 4'11&quot;)">Less than 150 cm (Less than 4'11")</option>
-              <option value="151 - 160 cm (4'11&quot; - 5'3&quot;)">151 - 160 cm (4'11" - 5'3")</option>
-              <option value="161 - 170 cm (5'3&quot; - 5'7&quot;)">161 - 170 cm (5'3" - 5'7")</option>
-              <option value="171 - 180 cm (5'7&quot; - 5'11&quot;)">171 - 180 cm (5'7" - 5'11")</option>
-              <option value="181 - 190 cm (5'11&quot; - 6'3&quot;)">181 - 190 cm (5'11" - 6'3")</option>
-              <option value="More than 190 cm (More than 6'3&quot;)">More than 190 cm (More than 6'3")</option>
+              <option value="Less than 150 cm (Less than 4&apos;11&quot;)">Less than 150 cm (Less than 4&apos;11&quot;)</option>
+              <option value="151 - 160 cm (4&apos;11&quot; - 5&apos;3&quot;)">151 - 160 cm (4&apos;11&quot; - 5&apos;3&quot;)</option>
+              <option value="161 - 170 cm (5&apos;3&quot; - 5&apos;7&quot;)">161 - 170 cm (5&apos;3&quot; - 5&apos;7&quot;)</option>
+              <option value="171 - 180 cm (5&apos;7&quot; - 5&apos;11&quot;)">171 - 180 cm (5&apos;7&quot; - 5&apos;11&quot;)</option>
+              <option value="181 - 190 cm (5&apos;11&quot; - 6&apos;3&quot;)">181 - 190 cm (5&apos;11&quot; - 6&apos;3&quot;)</option>
+              <option value="More than 190 cm (More than 6&apos;3&quot;)">More than 190 cm (More than 6&apos;3&quot;)</option>
             </select>
           </div>
 
