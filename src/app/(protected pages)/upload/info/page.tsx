@@ -88,7 +88,7 @@ export default function Page() {
             <div key={step} className="flex-1">
               <div
                 className={`h-2 rounded-full ${
-                  step <= 2
+                  step <= 3
                     ? "bg-gradient-to-r from-mainOrange to-mainGreen animate-gradient bg-[length:200%_200%]"
                     : "bg-gray-200"
                 }`}
@@ -96,7 +96,7 @@ export default function Page() {
             </div>
           ))}
         </div>
-        <p className="text-[11px] text-mainBlack mt-2">Step 2 of 5</p>
+        <p className="text-[11px] text-mainBlack mt-2">Step 3 of 5</p>
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-md mx-auto">

@@ -57,31 +57,30 @@ export default async function Page() {
   }
 
   return (
-    <div className="flex h-screen w-full">
-      <div className="w-1/2 h-full relative bg-black">
+    <div className="flex flex-col md:flex-row h-screen w-full">
+      <div className="w-full md:w-1/2 h-[40vh] md:h-full relative bg-black">
         <Image
           src="/wait.webp"
           alt="Professional headshot placeholder"
-          // Removed legacy props
           fill
-          style={{ objectFit: "cover" }} // Use style for objectFit
+          style={{ objectFit: "cover" }}
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black">
-          <div className="absolute bottom-0 left-0 right-0 p-8">
-            <p className="text-white text-xl font-light italic leading-relaxed">
+          <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
+            <p className="text-white text-lg md:text-xl font-light italic leading-relaxed">
               &ldquo;I needed a professional headshot and this service was a
               lifesaver!&rdquo;
             </p>
           </div>
         </div>
       </div>
-      <div className="w-1/2 h-full flex flex-col justify-center p-12 bg-white">
-        <div className="max-w-md">
+      <div className="w-full md:w-1/2 h-[60vh] md:h-full flex flex-col justify-center p-6 md:p-12 bg-white">
+        <div className="max-w-md mx-auto w-full">
           <p className="text-sm text-gray-500 mb-2">
             This process can take up to 2 hours
           </p>
-          <div className="w-64 bg-gray-200 rounded-full h-2 mb-6 overflow-hidden relative">
+          <div className="w-full md:w-64 bg-gray-200 rounded-full h-2 mb-6 overflow-hidden relative">
             <div className="absolute h-full w-1/4 bg-mainGreen rounded-full animate-progress-piece"></div>
           </div>
           <h2 className="text-xl font-bold mb-2 text-mainBlack">

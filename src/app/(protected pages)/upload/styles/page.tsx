@@ -254,7 +254,16 @@ export default function Page() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              {styleData.backgroundStyles.map((style, index) => {
+              {styleData.backgroundStyles
+                .sort((a, b) => {
+                  const popularStyles = ["Streets", "Office", "White"];
+                  const aIsPopular = popularStyles.includes(a.backgroundTitle);
+                  const bIsPopular = popularStyles.includes(b.backgroundTitle);
+                  if (aIsPopular && !bIsPopular) return -1;
+                  if (!aIsPopular && bIsPopular) return 1;
+                  return 0;
+                })
+                .map((style, index) => {
                 const isSelected = isStyleSelected(style);
                 const imagePath = userData?.gender === "woman" ? style.womenImage : style.menImage;
                 
@@ -273,8 +282,10 @@ export default function Page() {
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                       className="object-cover"
                     />
-                    {style.backgroundTitle === "Streets" && (
-                      <div className="absolute top-2 right-2 bg-mainYellow text-mainBlack text-xs font-semibold px-2 py-1 rounded-full">
+                    {(style.backgroundTitle === "Streets" || 
+                      style.backgroundTitle === "Office" || 
+                      style.backgroundTitle === "White") && (
+                      <div className="absolute top-2 right-2 bg-mainOrange text-white text-xs font-semibold px-2.5 py-0.5 rounded-full shadow-sm">
                         Popular
                       </div>
                     )}
