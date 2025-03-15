@@ -62,66 +62,83 @@ export async function fixDiscrepancy(userData: UserData | null) {
   };
 
   const planLimit = getPlanLimit(userData.planType);
-  const currentCount = userData.promptsResult?.length || 0;
-  const missingImages = planLimit - currentCount;
+  
+  // Calculate total images we currently have
+  const currentImages = userData.promptsResult?.reduce((total, result) => 
+    total + (result.data?.prompt?.images?.length || 0), 0) || 0;
+  
+  console.log("Current image count:", currentImages);
+  console.log("Plan limit:", planLimit);
 
-  if (missingImages > 0) {
+  if (currentImages < planLimit && userData.apiStatus?.id) {
+    try {
+      console.log("Fetching prompts from Astria...");
+      const astriaPrompts = await getAstriaPrompts(userData.apiStatus.id.toString());
+      
+      // Log unique images from Astria prompts
+      const uniqueAstriaImages = new Set(
+        astriaPrompts.flatMap(prompt => prompt.images || [])
+      );
+      console.log("Total unique Astria images:", uniqueAstriaImages.size);
 
+      // Instead of filtering out existing prompts, update them with latest data
+      const updatedPromptsResult = await Promise.all(astriaPrompts.map(async (prompt: Prompt) => {
+        // Ensure we're getting all images from each prompt
+        if (!prompt.images || prompt.images.length === 0) {
+          console.log(`No images found for prompt ${prompt.id}`);
+          return null;
+        }
 
-    if (userData.apiStatus?.id) {
-      try {
-        const astriaPrompts = await getAstriaPrompts(userData.apiStatus.id.toString());
+        const resolvedImages = await Promise.all(
+          prompt.images.map(getFinalImageUrl)
+        );
         
-        // Log unique images from Astria prompts
-        const uniqueAstriaImages = new Set(
-          astriaPrompts.flatMap(prompt => prompt.images || [])
-        );
-        console.log("Total unique Astria images:", uniqueAstriaImages.size);
+        if (resolvedImages.some(url => !url)) {
+          console.log(`Some images failed to resolve for prompt ${prompt.id}`);
+        }
+        
+        return {
+          data: {
+            prompt: {
+              id: prompt.id,
+              text: prompt.text,
+              steps: prompt.steps,
+              images: resolvedImages.filter(Boolean), // Remove any failed URLs
+              tune_id: prompt.tune_id,
+              created_at: prompt.created_at,
+              trained_at: prompt.trained_at,
+              updated_at: prompt.updated_at,
+              negative_prompt: prompt.negative_prompt,
+              started_training_at: prompt.started_training_at
+            }
+          },
+          timestamp: new Date().toISOString()
+        };
+      }));
 
-        // Get existing prompt IDs from promptsResult
-        const existingPromptIds = new Set(
-          userData.promptsResult?.map(item => item.data.prompt.id) || []
-        );
+      // Filter out any null results and empty prompts
+      const filteredPrompts = updatedPromptsResult.filter((result): result is NonNullable<typeof result> => 
+        result !== null && result.data.prompt.images.length > 0
+      );
 
-        // Instead of filtering out existing prompts, update them with latest data
-        const updatedPromptsResult = await Promise.all(astriaPrompts.map(async (prompt: Prompt) => {
-          const resolvedImages = await Promise.all(prompt.images.map(getFinalImageUrl));
-          
-          return {
-            data: {
-              prompt: {
-                id: prompt.id,
-                text: prompt.text,
-                steps: prompt.steps,
-                images: resolvedImages,
-                tune_id: prompt.tune_id,
-                created_at: prompt.created_at,
-                trained_at: prompt.trained_at,
-                updated_at: prompt.updated_at,
-                negative_prompt: prompt.negative_prompt,
-                started_training_at: prompt.started_training_at
-              }
-            },
-            timestamp: new Date().toISOString()
-          };
-        }));
+      // Update user with the filtered prompts
+      await updateUser({
+        promptsResult: filteredPrompts
+      });
 
-        await updateUser({
-          promptsResult: updatedPromptsResult
-        });
+      const totalImages = filteredPrompts.reduce((total, result) => 
+        total + (result.data.prompt.images.length || 0), 0
+      );
 
-        const uniqueImageUrls = new Set(
-          updatedPromptsResult.flatMap(entry => 
-            entry.data.prompt.images || []
-          )
-        );
+      console.log("Total images after sync:", totalImages);
+      console.log("Missing images:", planLimit - totalImages);
 
-        console.log("Total unique images:", uniqueImageUrls.size);
-
-        return updatedPromptsResult;
-      } catch (error) {
-        console.error("Error in fixDiscrepancy:", error);
-      }
+      return filteredPrompts;
+    } catch (error) {
+      console.error("Error in fixDiscrepancy:", error);
+      throw error; // Propagate the error for better error handling
     }
   }
+  
+  return userData.promptsResult;
 } 
