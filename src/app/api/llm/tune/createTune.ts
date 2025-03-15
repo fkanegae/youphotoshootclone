@@ -30,7 +30,8 @@ export async function createTune(userData: any) {
         "model_type": "lora",
         "name": gender,
         "image_urls": userPhotos.userSelfies,
-        "steps": 300,
+        "steps": 800,
+        "preset": "portrait",
         "callback": `${CALLBACK_DOMAIN}/api/llm/tune-webhook?webhook_secret=${process.env.APP_WEBHOOK_SECRET}&user_id=${userId}`
       }
     })
