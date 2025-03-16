@@ -67,7 +67,7 @@ export function Companies() {
                 width={160}
                 height={60}
                 src={company.logo}
-                className="h-14 w-40 grayscale opacity-30 dark:brightness-0 dark:invert mx-12"
+                className="h-14 w-40 grayscale opacity-60 filter contrast-75 dark:brightness-0 dark:invert mx-12 transition-opacity hover:opacity-100"
                 alt={company.name}
               />
             ))}
