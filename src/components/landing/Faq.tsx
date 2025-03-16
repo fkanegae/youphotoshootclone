@@ -26,8 +26,6 @@ export default function Faq() {
             </p>
           </div>
           <p className="text-mainWhite text-base mt-3">
-            Get answers to common questions about our professional AI-generated
-            headshot service for individuals and remote teams.
           </p>
         </div>
 

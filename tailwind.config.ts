@@ -24,6 +24,8 @@ const config: Config = {
         gradient: 'gradient 3s ease infinite',
         'progress-bar': 'progress 2s linear infinite',
         'progress-piece': 'progress-piece 2s linear infinite',
+        'marquee': 'marquee var(--duration, 40s) linear infinite',
+        'marquee-reverse': 'marquee var(--duration, 40s) linear infinite reverse',
       },
       keyframes: {
         gradient: {
@@ -35,6 +37,10 @@ const config: Config = {
             'background-size': '200% 200%',
             'background-position': 'right center',
           },
+        },
+        marquee: {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(calc(-100% - 1rem))' },
         },
       },
     },

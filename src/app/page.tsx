@@ -8,6 +8,7 @@ import Pitch1 from "@/components/landing/Pitch1";
 import Pitch2 from "@/components/landing/Pitch2";
 import Pricing from "@/components/landing/Pricing";
 import Faq from "@/components/landing/Faq";
+import { Companies } from "@/components/Companies";
 
 export default function Home() {
   const getUtm = cookies().get("utm_source")?.value;
@@ -20,6 +21,7 @@ export default function Home() {
       <Hero />
       <HeroSteps />
       <Gallery />
+      <Companies />
       <Pitch1 />
       <Pitch2 />
       <Pricing />

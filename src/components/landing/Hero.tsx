@@ -16,8 +16,7 @@ const HeadingText = () => (
 
 const Description = () => (
   <p className="text-mainWhite text-opacity-80 text-lg md:text-xl py-2 max-w-3xl mx-auto">
-    Get professional headshots in minutes. Upload photos, pick your styles &
-    receive 100+ headshots. Created in Europe.
+    Transform your everyday photos into professional headshots. In just a few minutes.
   </p>
 );
 
