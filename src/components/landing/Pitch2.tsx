@@ -85,11 +85,10 @@ export default function Pitch2() {
             ))}
           </div>
           <p className="italic mb-2 text-mainWhite text-lg">
-            &ldquo;I needed a business photo with a 24 hour turnaround - you
-            beat it by 22 hours!&rdquo;
+            &ldquo;I can't believe it was done in 10 minutes with just a few selfies of mine&rdquo;
           </p>
           <div className="flex items-center justify-center">
-            <span className="font-semibold text-mainWhite">Tobias Sjöblom</span>
+            <span className="font-semibold text-mainWhite">Tom Porter</span>
           </div>
         </div>
       </div>

@@ -148,9 +148,7 @@ export default function Pitch1() {
             ))}
           </div>
           <p className="italic mb-2">
-            &quot;I upgraded my profile picture using this service. It&apos;s
-            more affordable than a studio session, yet the quality surpasses a
-            home photoshoot.&quot;
+            &quot;Everyone at the office gets shocked when I tell them my LinkedIn picture is AI generated. It looks so real!&quot;
           </p>
           <div className="flex items-center justify-center">
             {/* <Image
@@ -160,7 +158,7 @@ export default function Pitch1() {
               height={32}
               className="rounded-full mr-2"
             /> */}
-            <span className="font-semibold">Alexander</span>
+            <span className="font-semibold">Robert</span>
           </div>
         </div>
       </div>
