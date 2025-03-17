@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 const people = [
   {
-    name: "Karin",
+    name: "Karen",
     review:
       "What a fun experience! Turned out amazing and saved me money from expensive photographer",
     selfieUrl: "/democard/demo2-selfie.webp",
