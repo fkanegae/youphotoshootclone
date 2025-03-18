@@ -169,32 +169,28 @@ const EmblaCarousel: React.FC<EmblaCarouselPropType> = (props) => {
 
   return (
     <div className="relative">
-      <div className="overflow-visible" ref={emblaRef}>
+      <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {slides.map((slide, index) => (
             <div
-              className="min-w-0 flex-[0_0_100%] md:flex-[0_0_85%] lg:flex-[0_0_50%]"
+              className="flex-[0_0_100%]"
               key={index}
             >
-              <div
-                className={`embla__slide__number w-full flex items-center justify-center h-full ${
-                  className || ""
-                }`}
-              >
+              <div className={`w-full ${className || ""}`}>
                 {slide}
               </div>
             </div>
           ))}
         </div>
       </div>
-      <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-3 z-10">
+      <div className="flex items-center justify-center gap-4 mt-6">
         <PrevButton
-          className="w-8 h-8 bg-white/90 backdrop-blur-sm text-mainBlack rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-md"
+          className="w-10 h-10 bg-mainBlack text-mainWhite rounded-full flex items-center justify-center"
           onClick={onPrevButtonClick}
           disabled={prevBtnDisabled}
         />
         <NextButton
-          className="w-8 h-8 bg-white/90 backdrop-blur-sm text-mainBlack rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-md"
+          className="w-10 h-10 bg-mainBlack text-mainWhite rounded-full flex items-center justify-center"
           onClick={onNextButtonClick}
           disabled={nextBtnDisabled}
         />
@@ -205,15 +201,14 @@ const EmblaCarousel: React.FC<EmblaCarouselPropType> = (props) => {
 
 const Gallery = () => {
   const OPTIONS: EmblaOptionsType = { 
-    loop: true, 
-    align: "center",
-    containScroll: "trimSnaps"
+    loop: true,
+    align: "start"
   };
   
   const slides = CarouselSlidesData.map((testimonial) => (
     <div
       key={testimonial.id}
-      className="relative aspect-[4/3] md:aspect-[16/9] w-full"
+      className="relative h-[400px]"
     >
       <Image
         src={testimonial.image}
@@ -222,34 +217,18 @@ const Gallery = () => {
         className="object-cover"
         priority
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-      <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-2">
-        <p className="text-lg md:text-xl text-white font-medium leading-snug">
-          {testimonial.text}
-        </p>
-        <div className="flex flex-col gap-0.5">
-          <p className="text-white font-semibold">
-            {testimonial.name}
-          </p>
-          <p className="text-white/90 text-sm">
-            {testimonial.role}
-          </p>
-        </div>
-      </div>
     </div>
   ));
 
   return (
-    <section className="w-full py-16 md:py-24 bg-mainWhite">
+    <section className="w-full py-16 bg-mainWhite">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-center mb-12 text-mainBlack px-4">
+        <h2 className="text-3xl font-semibold text-center mb-10 text-mainBlack px-4">
           What Our Customers Say
         </h2>
         <EmblaCarousel
           slides={slides}
           options={OPTIONS}
-          maxTranslateY={250}
-          tweenFactorBase={0.2}
           className="w-full"
         />
       </div>
