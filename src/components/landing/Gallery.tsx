@@ -77,7 +77,19 @@ const EmblaCarousel: React.FC<EmblaCarouselPropType> = (props) => {
   } = props;
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    options,
+    {
+      ...options,
+      dragFree: true,
+      containScroll: "trimSnaps",
+      watchDrag: (event: any) => {
+        // Prevent zoom gesture on mobile
+        const touchEvent = event as TouchEvent;
+        if (touchEvent.type === "touchmove" && touchEvent.touches && touchEvent.touches.length > 1) {
+          return false;
+        }
+        return true;
+      },
+    },
     autoplay
       ? [Autoplay({ delay: autoplayDelay, stopOnInteraction: false })]
       : []
@@ -167,13 +179,27 @@ const EmblaCarousel: React.FC<EmblaCarouselPropType> = (props) => {
       .on("scroll", tweenTranslate);
   }, [emblaApi, setTweenFactor, setTweenNodes, tweenTranslate]);
 
+  useEffect(() => {
+    // Prevent pinch zoom on mobile
+    const preventDefault = (e: TouchEvent) => {
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('touchmove', preventDefault, { passive: false });
+    return () => {
+      document.removeEventListener('touchmove', preventDefault);
+    };
+  }, []);
+
   return (
-    <div className="relative">
+    <div className="relative touch-pan-y">
       <div className="py-10 overflow-visible" ref={emblaRef}>
-        <div className="flex">
+        <div className="flex touch-pan-y">
           {slides.map((slide, index) => (
             <div
-              className="max-[350px]:[flex:0_0_18rem] [flex:0_0_20rem] flex pl-4"
+              className="relative flex-[0_0_90%] sm:flex-[0_0_85%] md:flex-[0_0_45%] pl-4"
               key={index}
             >
               <div
