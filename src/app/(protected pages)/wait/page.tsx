@@ -78,7 +78,7 @@ export default async function Page() {
       <div className="w-full md:w-1/2 h-[60vh] md:h-full flex flex-col justify-center p-6 md:p-12 bg-white">
         <div className="max-w-md mx-auto w-full">
           <p className="text-sm text-gray-500 mb-2">
-            This process can take up to 2 hours
+            This process can take up to 15 minutes
           </p>
           <div className="w-full md:w-64 bg-gray-200 rounded-full h-2 mb-6 overflow-hidden relative">
             <div className="absolute h-full w-1/4 bg-mainGreen rounded-full animate-progress-piece"></div>
