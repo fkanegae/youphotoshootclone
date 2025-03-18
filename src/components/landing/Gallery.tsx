@@ -1,119 +1,191 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useCallback, useRef } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import {
+  EmblaCarouselType,
+  EmblaEventType,
+  EmblaOptionsType,
+} from "embla-carousel";
+import Autoplay from "embla-carousel-autoplay";
+import { NextButton, PrevButton, useCarouselButtons } from "./carousel-button";
 
-const people = [
+const CarouselSlidesData = [
   {
-    name: "Karen",
-    review:
-      "What a fun experience! Turned out amazing and saved me money from expensive photographer",
-    selfieUrl: "/democard/demo2-selfie.webp",
-    aiImages: "/democard/demo2-ai.webp",
+    id: 1,
+    text: "The photos turned out amazing! The AI really captured my style.",
+    name: "Sarah Johnson",
+    role: "Marketing Professional",
+    image: "/testimonials/demo1-ai.webp",
   },
   {
-    name: "Rasmus",
-    review: "Loved the variety and styling. Very happy with the images!",
-    selfieUrl: "/democard/demo6-selfie.webp",
-    aiImages: "/democard/demo6-ai.webp",
+    id: 2,
+    text: "Incredible value for money. Professional photos without the professional price tag.",
+    name: "Michael Chen",
+    role: "Software Engineer",
+    image: "/testimonials/demo2-ai.webp",
   },
-  // Add more people as needed
+  {
+    id: 3,
+    text: "I was skeptical at first, but the results blew me away. Highly recommend!",
+    name: "Emma Rodriguez",
+    role: "Content Creator",
+    image: "/testimonials/demo3-ai.webp",
+  },
+  {
+    id: 4,
+    text: "Perfect for my LinkedIn profile. Got so many compliments on my new photos.",
+    name: "James Wilson",
+    role: "Business Consultant",
+    image: "/testimonials/demo4-ai.webp",
+  },
+  {
+    id: 5,
+    text: "The whole process was so easy and fun. Love how the photos turned out!",
+    name: "Lisa Thompson",
+    role: "Freelance Designer",
+    image: "/testimonials/demo5-ai.webp",
+  },
 ];
 
-const ImageGallery = () => {
-  useEffect(() => {
-    const preventRightClick = (e: MouseEvent) => {
-      if (e.target instanceof HTMLImageElement) {
-        e.preventDefault();
-      }
-    };
+type EmblaCarouselPropType = {
+  className?: string;
+  slides: React.ReactNode[];
+  options?: EmblaOptionsType;
+  autoplay?: boolean;
+  autoplayDelay?: number;
+  maxTranslateY?: number;
+  tweenFactorBase?: number;
+};
 
-    document.addEventListener("contextmenu", preventRightClick);
+const TWEEN_FACTOR_BASE = 0.4;
+const MAX_TRANSLATE_Y = 120;
 
-    return () => {
-      document.removeEventListener("contextmenu", preventRightClick);
-    };
+const numberWithinRange = (number: number, min: number, max: number): number =>
+  Math.min(Math.max(number, min), max);
+
+const EmblaCarousel: React.FC<EmblaCarouselPropType> = (props) => {
+  const {
+    slides,
+    options,
+    className,
+    autoplay = true,
+    autoplayDelay = 2000,
+    maxTranslateY = MAX_TRANSLATE_Y,
+    tweenFactorBase = TWEEN_FACTOR_BASE,
+  } = props;
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    options,
+    autoplay
+      ? [Autoplay({ delay: autoplayDelay, stopOnInteraction: false })]
+      : []
+  );
+  const tweenFactor = useRef(0);
+  const tweenNodes = useRef<HTMLElement[]>([]);
+
+  const {
+    prevBtnDisabled,
+    nextBtnDisabled,
+    onPrevButtonClick,
+    onNextButtonClick,
+  } = useCarouselButtons(emblaApi);
+
+  const setTweenNodes = useCallback((emblaApi: EmblaCarouselType): void => {
+    tweenNodes.current = emblaApi.slideNodes().map((slideNode: HTMLElement) => {
+      return slideNode.querySelector(".embla__slide__number") as HTMLElement;
+    });
   }, []);
 
-  return (
-    <div className="w-full bg-gradient-to-b from-mainWhite to-mainWhite py-20 sm:py-32">
-      <div className="max-w-section mx-auto px-section">
-        <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl text-center mb-8 text-mainBlack">
-          Our Customers Trust Us
-        </h2>
-        <div className="flex items-center justify-center mb-16">
-          <svg
-            className="w-6 h-6 mr-2 text-mainBlack"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <p className="text-xl text-center text-mainBlack">
-            Money Back Guarantee If Not Satisfied
-          </p>
-        </div>
+  const setTweenFactor = useCallback((emblaApi: EmblaCarouselType) => {
+    tweenFactor.current = tweenFactorBase * emblaApi.scrollSnapList().length;
+  }, []);
 
-        <div className="mt-16 space-y-16">
-          {people.map((person, index) => (
+  const tweenTranslate = useCallback(
+    (emblaApi: EmblaCarouselType, eventName?: EmblaEventType) => {
+      const engine = emblaApi.internalEngine();
+      const scrollProgress = emblaApi.scrollProgress();
+      const slidesInView = emblaApi.slidesInView();
+      const isScrollEvent = eventName === "scroll";
+
+      emblaApi
+        .scrollSnapList()
+        .forEach((scrollSnap: number, snapIndex: number) => {
+          let diffToTarget = scrollSnap - scrollProgress;
+          const slidesInSnap = engine.slideRegistry[snapIndex];
+
+          slidesInSnap.forEach((slideIndex: number) => {
+            if (isScrollEvent && !slidesInView.includes(slideIndex)) return;
+
+            if (engine.options.loop) {
+              engine.slideLooper.loopPoints.forEach((loopItem: any) => {
+                const target = loopItem.target();
+
+                if (slideIndex === loopItem.index && target !== 0) {
+                  const sign = Math.sign(target);
+
+                  if (sign === -1) {
+                    diffToTarget = scrollSnap - (1 + scrollProgress);
+                  }
+                  if (sign === 1) {
+                    diffToTarget = scrollSnap + (1 - scrollProgress);
+                  }
+                }
+              });
+            }
+
+            const tweenValue = Math.abs(diffToTarget * tweenFactor.current);
+            const translateY = numberWithinRange(
+              tweenValue * maxTranslateY,
+              0,
+              maxTranslateY
+            );
+
+            const opacity = numberWithinRange(1 - tweenValue * 0.5, 0.5, 1);
+
+            const tweenNode = tweenNodes.current[slideIndex];
+            tweenNode.style.transform = `translateY(${translateY}px)`;
+            tweenNode.style.opacity = opacity.toString();
+          });
+        });
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    setTweenNodes(emblaApi);
+    setTweenFactor(emblaApi);
+    tweenTranslate(emblaApi);
+
+    emblaApi
+      .on("reInit", setTweenNodes)
+      .on("reInit", setTweenFactor)
+      .on("reInit", tweenTranslate)
+      .on("scroll", tweenTranslate);
+  }, [emblaApi, setTweenFactor, setTweenNodes, tweenTranslate]);
+
+  return (
+    <div className="relative">
+      <div className="py-10 overflow-visible" ref={emblaRef}>
+        <div className="flex">
+          {slides.map((slide, index) => (
             <div
+              className="max-[350px]:[flex:0_0_18rem] [flex:0_0_20rem] flex pl-4"
               key={index}
-              className="bg-mainWhite shadow-lg rounded-lg overflow-hidden"
             >
               <div
-                className={`flex flex-col ${
-                  index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                className={`embla__slide__number w-full flex items-center justify-center h-full ${
+                  className || ""
                 }`}
               >
-                <div className="w-full md:w-1/2 p-8 flex flex-col justify-center items-center text-center bg-gradient-to-br from-mainWhite via-mainGreen/10 to-mainOrange/10">
-                  <p className="text-2xl sm:text-3xl font-semibold text-mainBlack mb-8">
-                    &ldquo;{person.review}&rdquo;
-                  </p>
-                  <div className="flex items-center">
-                    <div className="flex mr-2">
-                      {[...Array(5)].map((_, i) => (
-                        <svg
-                          key={i}
-                          className="w-5 h-5 text-mainOrange"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
+                <div className="h-full w-full">
+                  <div className="group relative z-0 h-full w-full overflow-hidden rounded">
+                    <div className="overflow-hidden rounded h-full w-full">
+                      {slide}
                     </div>
-                    <h3 className="text-lg font-bold text-mainBlack">
-                      {person.name}
-                    </h3>
-                  </div>
-                </div>
-                <div className="w-full md:w-1/2 relative aspect-[4/5]">
-                  <Image
-                    src={person.aiImages}
-                    alt={`AI-generated image of ${person.name}`}
-                    fill
-                    className="select-none object-cover"
-                    draggable="false"
-                  />
-                  <div className="absolute bottom-4 left-4 w-1/4 aspect-square">
-                    <Image
-                      src={person.selfieUrl}
-                      alt={`${person.name}&apos;s selfie`}
-                      fill
-                      className="rounded-md select-none object-cover"
-                      draggable="false"
-                    />
-                  </div>
-                  <div className="absolute bottom-4 right-4 bg-mainBlack bg-opacity-70 text-mainWhite text-xs px-2 py-1 rounded">
-                    AI GENERATED
                   </div>
                 </div>
               </div>
@@ -121,8 +193,69 @@ const ImageGallery = () => {
           ))}
         </div>
       </div>
+      <div className="flex items-center justify-center gap-4 py-10">
+        <PrevButton
+          className="w-10 h-10 bg-mainBlack text-mainWhite rounded-full flex items-center justify-center hover:bg-mainBlack/80 transition-colors"
+          onClick={onPrevButtonClick}
+          disabled={prevBtnDisabled}
+        />
+        <NextButton
+          className="w-10 h-10 bg-mainBlack text-mainWhite rounded-full flex items-center justify-center hover:bg-mainBlack/80 transition-colors"
+          onClick={onNextButtonClick}
+          disabled={nextBtnDisabled}
+        />
+      </div>
     </div>
   );
 };
 
-export default ImageGallery;
+const Gallery = () => {
+  const OPTIONS: EmblaOptionsType = { loop: true, align: "center" };
+  const slides = CarouselSlidesData.map((testimonial) => (
+    <div
+      key={testimonial.id}
+      className="relative flex-[0_0_90%] md:flex-[0_0_40%] h-[400px] mx-4"
+    >
+      <Image
+        src={testimonial.image}
+        alt={testimonial.name}
+        fill
+        className="object-cover rounded-2xl shadow-lg"
+        priority
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-2xl" />
+      <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-2">
+        <p className="text-lg text-white font-medium">
+          {testimonial.text}
+        </p>
+        <div className="flex flex-col">
+          <p className="text-white font-semibold">
+            {testimonial.name}
+          </p>
+          <p className="text-white/90 text-sm">
+            {testimonial.role}
+          </p>
+        </div>
+      </div>
+    </div>
+  ));
+
+  return (
+    <section className="w-full py-20 bg-mainWhite">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl text-center mb-16 text-mainBlack">
+          What Our Customers Say
+        </h2>
+        <EmblaCarousel
+          slides={slides}
+          options={OPTIONS}
+          maxTranslateY={250}
+          tweenFactorBase={0.2}
+          className="w-full"
+        />
+      </div>
+    </section>
+  );
+};
+
+export default Gallery;

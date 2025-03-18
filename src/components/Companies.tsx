@@ -15,16 +15,16 @@ const companies = [
     logo: "/logos/amazon.svg"
   },
   {
-    name: "Netflix",
-    logo: "/logos/netflix.svg"
+    name: "Mckinsey",
+    logo: "/logos/mckinsey.svg"
   },
   {
     name: "YouTube",
     logo: "/logos/youtube.svg"
   },
   {
-    name: "Instagram",
-    logo: "/logos/instagram.svg"
+    name: "JpMorgan",
+    logo: "/logos/jpmorgan.svg"
   },
   {
     name: "Uber",
