@@ -127,7 +127,7 @@ const Gallery = () => {
   const slides = CarouselSlidesData.map((testimonial) => (
     <div
       key={testimonial.id}
-      className="aspect-[4/5] sm:aspect-[3/4] md:aspect-[16/9] relative mx-2 sm:mx-4"
+      className="h-[400px] sm:h-[450px] md:h-[500px] lg:h-[600px] relative mx-2 sm:mx-4"
     >
       <Image
         src={testimonial.image}
