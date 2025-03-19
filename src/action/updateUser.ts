@@ -6,10 +6,6 @@ import { redirect } from 'next/navigation';
 interface UserFormData {
   name?: string;
   age?: string;
-  ethnicity?: string;
-  height?: string;
-  bodyType?: string;
-  eyeColor?: string;
   gender?: string;
   userPhotos?: {
     userSelfies?: string[];

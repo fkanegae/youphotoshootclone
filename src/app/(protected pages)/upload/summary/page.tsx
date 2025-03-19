@@ -13,18 +13,6 @@ type StyleItem = {
   clothingPrompt?: string;
 };
 
-function getEyeColorClass(color: string) {
-  const colorMap: { [key: string]: string } = {
-    Hazel: "bg-amber-500",
-    Gray: "bg-gray-400",
-    "Light brown": "bg-amber-600",
-    Blue: "bg-blue-500",
-    Green: "bg-green-500",
-    "Dark brown": "bg-amber-900",
-  };
-  return colorMap[color] || "bg-gray-300";
-}
-
 async function submitPhotos() {
   "use server";
 
@@ -64,8 +52,7 @@ async function submitPhotos() {
 
 export default async function Page() {
   const userData = await getUser();
-  //console.log(userData);
-  const user = userData?.[0]; // Assuming the first user in the array
+  const user = userData?.[0];
 
   if (!user) {
     return <div>Error: User data not found</div>;
@@ -113,11 +100,7 @@ export default async function Page() {
                 {[
                   { label: "Name", value: user.name },
                   { label: "Age", value: user.age },
-                  { label: "Body Type", value: user.bodyType },
-                  { label: "Height", value: user.height },
-                  { label: "Ethnicity", value: user.ethnicity },
                   { label: "Gender", value: user.gender },
-                  { label: "Eye color", value: user.eyeColor, color: true },
                 ].map((item, index) => (
                   <div
                     key={index}
@@ -127,18 +110,7 @@ export default async function Page() {
                       {item.label}
                     </p>
                     <p className="text-mainBlack text-sm">
-                      {item.color ? (
-                        <span className="flex items-center">
-                          <span
-                            className={`w-3 h-3 rounded-full mr-2 ${getEyeColorClass(
-                              item.value
-                            )}`}
-                          ></span>
-                          {item.value}
-                        </span>
-                      ) : (
-                        item.value
-                      )}
+                      {item.value}
                     </p>
                   </div>
                 ))}
