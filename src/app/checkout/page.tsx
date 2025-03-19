@@ -135,7 +135,7 @@ export default function CheckoutPage({
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                Done in 2 hours or less
+                Done in 15 minutes or less
               </div>
               <div className="flex items-center">
                 <svg
@@ -164,7 +164,7 @@ export default function CheckoutPage({
                   "@context": "https://schema.org",
                   "@type": "Product",
                   name: `${selectedPlan.name} AI Headshot Package`,
-                  description: `${selectedPlan.headshots} headshots, Unique backgrounds, ${selectedPlan.time} hour turnaround time`,
+                  description: `${selectedPlan.headshots} headshots, Unique backgrounds, ${selectedPlan.time * 10} minute turnaround time`,
                   offers: {
                     "@type": "Offer",
                     price: selectedPlan.price,
@@ -190,7 +190,7 @@ export default function CheckoutPage({
                   <li>{selectedPlan.headshots} headshots</li>
                   <li>Unique backgrounds</li>
                   <li>
-                    {selectedPlan.time} hour{selectedPlan.time > 1 ? "s" : ""}{" "}
+                    {selectedPlan.time * 10} minute{selectedPlan.time * 10 > 1 ? "s" : ""}{" "}
                     turnaround time
                   </li>
                 </ul>

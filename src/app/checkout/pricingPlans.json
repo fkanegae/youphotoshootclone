@@ -4,7 +4,7 @@
     "price": 29,
     "originalPrice": 58,
     "headshots": 10,
-    "time": 3,
+    "time": 1,
     "isPopular": false,
     "stripeUrl": "https://buy.stripe.com/14k29EbQpaeD4g03cj"
   },
@@ -13,7 +13,7 @@
     "price": 39,
     "originalPrice": 78,
     "headshots": 100,
-    "time": 2,
+    "time": 1,
     "isPopular": true,
     "stripeUrl": "https://buy.stripe.com/28o4hMaMl1I7aEo28c"
   },

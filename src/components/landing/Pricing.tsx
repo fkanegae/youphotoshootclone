@@ -40,7 +40,7 @@ const PricingCard = ({
             ></path>
           </svg>
           {feature === "time" &&
-            `${plan.time} hour${plan.time > 1 ? "s" : ""} turnaround time`}
+            `${plan.time * 10} minute${plan.time * 10 > 1 ? "s" : ""} turnaround time`}
           {feature === "headshots" && `${plan.headshots} headshots`}
           {feature === "styles" && "Unique backgrounds and clothing"}
         </li>
@@ -54,8 +54,8 @@ const PricingCard = ({
             : "bg-mainWhite text-mainBlack border border-mainBlack hover:bg-gray-100"
         }`}
       >
-        Get {plan.headshots} headshots in {plan.time} hour
-        {plan.time > 1 ? "s" : ""}
+        Get {plan.headshots} headshots in {plan.time * 10} minute
+        {plan.time * 10 > 1 ? "s" : ""}
       </button>
     </Link>
   </div>
@@ -67,14 +67,14 @@ export default function Pricing() {
       name: "Basic",
       price: 29,
       headshots: 10,
-      time: 3,
+      time: 1,
       isPopular: false,
     },
     {
       name: "Professional",
       price: 39,
       headshots: 100,
-      time: 2,
+      time: 1,
       isPopular: true,
     },
     {

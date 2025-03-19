@@ -18,7 +18,7 @@ export const siteConfig = {
     },
     {
       question: "How long does an AI headshot take?",
-      answer: "We don't cut corners when it comes to generating photorealistic AI headshots. Our Basic package delivers 10 photos in about 10 minutes, while Professional and Executive packages can take a bit longer since they generate up to 100-200 photos. But no matter which package you choose, you'll always get your results in just a few minutes."
+      answer: "We don't cut corners when it comes to generating photorealistic AI headshots. All our packages deliver your AI headshots in about 10 minutes, regardless of whether you choose 10, 100, or 200 photos. We've optimized our AI to work quickly without compromising on quality."
     },
     {
       question: "What do people misunderstand about AI headshots?",

@@ -48,7 +48,7 @@ export default function Pitch1() {
                   ],
                   [
                     "Our AI works its magic",
-                    "1-2 hours",
+                    "10-20 minutes",
                     "Our AI will pull your most photogenic qualities from the photos you uploaded.",
                   ],
                   [
