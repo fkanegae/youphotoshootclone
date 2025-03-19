@@ -246,10 +246,24 @@ export async function POST(request: Request) {
       promptsResult: updatedPromptsResult
     };
 
-    // Update work status when we have at least one image
-    if (userData.workStatus === 'ongoing' && totalImages > 0) {
-      updateObject.workStatus = totalImages >= totalRequiredImages ? 'complete' : 'partial';
-      console.log(`Work status changed to ${updateObject.workStatus}. Total images: ${totalImages}/${totalRequiredImages}`);
+    // More aggressive workStatus update - if we have any images and status is ongoing, mark as partial
+    if (userData.workStatus === 'ongoing') {
+      // Always update workStatus if we have any images
+      if (totalImages > 0) {
+        updateObject.workStatus = totalImages >= totalRequiredImages ? 'complete' : 'partial';
+        console.log(`Updating workStatus to ${updateObject.workStatus}. Images: ${totalImages}/${totalRequiredImages}`);
+      }
+      
+      // Log detailed status for debugging
+      console.log('Current status:', {
+        currentWorkStatus: userData.workStatus,
+        hasImages: totalImages > 0,
+        totalImages,
+        requiredImages: totalRequiredImages,
+        promptsReceived: totalPrompts,
+        uniquePromptIndexes: Array.from(uniquePromptIndexes),
+        updatingTo: updateObject.workStatus || 'no change'
+      });
     }
 
     // Check if we need to generate backup prompts
