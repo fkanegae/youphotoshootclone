@@ -72,22 +72,18 @@ const EmblaCarousel: React.FC<EmblaCarouselPropType> = (props) => {
     className,
     autoplay = true,
     autoplayDelay = 2000,
-    maxTranslateY = MAX_TRANSLATE_Y,
-    tweenFactorBase = TWEEN_FACTOR_BASE,
   } = props;
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       ...options,
-      dragFree: true,
-      containScroll: "trimSnaps"
+      containScroll: "trimSnaps",
+      align: "center"
     },
     autoplay
       ? [Autoplay({ delay: autoplayDelay, stopOnInteraction: false })]
       : []
   );
-  const tweenFactor = useRef(0);
-  const tweenNodes = useRef<HTMLElement[]>([]);
 
   const {
     prevBtnDisabled,
@@ -96,108 +92,21 @@ const EmblaCarousel: React.FC<EmblaCarouselPropType> = (props) => {
     onNextButtonClick,
   } = useCarouselButtons(emblaApi);
 
-  const setTweenNodes = useCallback((emblaApi: EmblaCarouselType): void => {
-    tweenNodes.current = emblaApi.slideNodes().map((slideNode: HTMLElement) => {
-      return slideNode.querySelector(".embla__slide__number") as HTMLElement;
-    });
-  }, []);
-
-  const setTweenFactor = useCallback((emblaApi: EmblaCarouselType) => {
-    tweenFactor.current = tweenFactorBase * emblaApi.scrollSnapList().length;
-  }, []);
-
-  const tweenTranslate = useCallback(
-    (emblaApi: EmblaCarouselType, eventName?: EmblaEventType) => {
-      const engine = emblaApi.internalEngine();
-      const scrollProgress = emblaApi.scrollProgress();
-      const slidesInView = emblaApi.slidesInView();
-      const isScrollEvent = eventName === "scroll";
-
-      emblaApi
-        .scrollSnapList()
-        .forEach((scrollSnap: number, snapIndex: number) => {
-          let diffToTarget = scrollSnap - scrollProgress;
-          const slidesInSnap = engine.slideRegistry[snapIndex];
-
-          slidesInSnap.forEach((slideIndex: number) => {
-            if (isScrollEvent && !slidesInView.includes(slideIndex)) return;
-
-            if (engine.options.loop) {
-              engine.slideLooper.loopPoints.forEach((loopItem: any) => {
-                const target = loopItem.target();
-
-                if (slideIndex === loopItem.index && target !== 0) {
-                  const sign = Math.sign(target);
-
-                  if (sign === -1) {
-                    diffToTarget = scrollSnap - (1 + scrollProgress);
-                  }
-                  if (sign === 1) {
-                    diffToTarget = scrollSnap + (1 - scrollProgress);
-                  }
-                }
-              });
-            }
-
-            const tweenValue = Math.abs(diffToTarget * tweenFactor.current);
-            const translateY = numberWithinRange(
-              tweenValue * maxTranslateY,
-              0,
-              maxTranslateY
-            );
-
-            const opacity = numberWithinRange(1 - tweenValue * 0.5, 0.5, 1);
-
-            const tweenNode = tweenNodes.current[slideIndex];
-            tweenNode.style.transform = `translateY(${translateY}px)`;
-            tweenNode.style.opacity = opacity.toString();
-          });
-        });
-    },
-    []
-  );
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    setTweenNodes(emblaApi);
-    setTweenFactor(emblaApi);
-    tweenTranslate(emblaApi);
-
-    emblaApi
-      .on("reInit", setTweenNodes)
-      .on("reInit", setTweenFactor)
-      .on("reInit", tweenTranslate)
-      .on("scroll", tweenTranslate);
-  }, [emblaApi, setTweenFactor, setTweenNodes, tweenTranslate]);
-
   return (
-    <div className="relative">
-      <div className="py-10 overflow-visible" ref={emblaRef}>
-        <div className="flex">
+    <div className="relative w-full">
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex touch-pan-y">
           {slides.map((slide, index) => (
             <div
-              className="relative flex-[0_0_90%] sm:flex-[0_0_85%] md:flex-[0_0_45%] pl-4"
+              className="min-w-[100%] sm:min-w-[85%] md:min-w-[45%] pl-4 relative"
               key={index}
             >
-              <div
-                className={`embla__slide__number w-full flex items-center justify-center h-full ${
-                  className || ""
-                }`}
-              >
-                <div className="h-full w-full">
-                  <div className="group relative z-0 h-full w-full overflow-hidden rounded">
-                    <div className="overflow-hidden rounded h-full w-full">
-                      {slide}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {slide}
             </div>
           ))}
         </div>
       </div>
-      <div className="flex items-center justify-center gap-4 py-10">
+      <div className="flex items-center justify-center gap-4 py-6">
         <PrevButton
           className="w-10 h-10 bg-mainBlack text-mainWhite rounded-full flex items-center justify-center hover:bg-mainBlack/80 transition-colors"
           onClick={onPrevButtonClick}
@@ -214,26 +123,27 @@ const EmblaCarousel: React.FC<EmblaCarouselPropType> = (props) => {
 };
 
 const Gallery = () => {
-  const OPTIONS: EmblaOptionsType = { loop: true, align: "center" };
+  const OPTIONS: EmblaOptionsType = { loop: true };
   const slides = CarouselSlidesData.map((testimonial) => (
     <div
       key={testimonial.id}
-      className="relative flex-[0_0_100%] sm:flex-[0_0_85%] md:flex-[0_0_45%] h-[300px] sm:h-[350px] md:h-[400px] mx-2 sm:mx-4"
+      className="aspect-[4/5] sm:aspect-[3/4] md:aspect-[16/9] relative mx-2 sm:mx-4"
     >
       <Image
         src={testimonial.image}
         alt={testimonial.name}
         fill
         className="object-cover rounded-lg sm:rounded-2xl shadow-lg"
+        sizes="(max-width: 640px) 90vw, (max-width: 768px) 85vw, 45vw"
         priority
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-lg sm:rounded-2xl" />
-      <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 flex flex-col gap-1.5 sm:gap-2">
-        <p className="text-base sm:text-lg text-white font-medium line-clamp-3 sm:line-clamp-none">
+      <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 flex flex-col gap-2">
+        <p className="text-sm sm:text-base md:text-lg text-white font-medium line-clamp-3">
           {testimonial.text}
         </p>
         <div className="flex flex-col">
-          <p className="text-white font-semibold text-sm sm:text-base">
+          <p className="text-white font-semibold text-xs sm:text-sm md:text-base">
             {testimonial.name}
           </p>
           <p className="text-white/90 text-xs sm:text-sm">
@@ -245,16 +155,15 @@ const Gallery = () => {
   ));
 
   return (
-    <section className="w-full py-12 sm:py-16 md:py-20 bg-mainWhite">
+    <section className="w-full py-8 sm:py-12 md:py-16 bg-mainWhite">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tighter text-center mb-8 sm:mb-12 md:mb-16 text-mainBlack">
+        <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tighter text-center mb-6 sm:mb-8 md:mb-12 text-mainBlack">
           What Our Customers Say
         </h2>
         <EmblaCarousel
           slides={slides}
           options={OPTIONS}
-          maxTranslateY={200}
-          tweenFactorBase={0.2}
+          autoplayDelay={3000}
           className="w-full"
         />
       </div>
