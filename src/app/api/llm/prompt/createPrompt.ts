@@ -37,6 +37,22 @@ async function fetchWithRetry(url: string, options: RequestInit, retries: number
   }
 }
 
+// Add interface for Astria API response
+interface AstriaPromptResult {
+  promptIndex?: number;
+  id?: number;
+  text?: string;
+  images?: string[];
+  steps?: number;
+  tune_id?: number;
+  created_at?: string;
+  trained_at?: string;
+  updated_at?: string;
+  negative_prompt?: string;
+  started_training_at?: string;
+  error?: boolean;
+}
+
 /// Function to create prompts
 export async function createPrompt(userData: any) {
   const user = userData[0];
@@ -48,8 +64,8 @@ export async function createPrompt(userData: any) {
   const prompts = getPromptsAttributes(user);
   console.log(`Generated ${prompts.length} prompts for processing`);
   
-  const results = [];
-  const failedPrompts = [];
+  const results: AstriaPromptResult[] = [];
+  const failedPrompts: Array<{ index: number; prompt: string; error: string }> = [];
   let totalSuccessfulPrompts = 0;
 
   // Images per prompt based on plan type, will be multiplied by 10 prompts
