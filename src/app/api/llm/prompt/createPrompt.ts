@@ -13,7 +13,6 @@ const headers = { Authorization: `Bearer ${API_KEY}` }
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
-const DELAY = 1000; // 1 second between API calls
 
 async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -37,216 +36,69 @@ async function fetchWithRetry(url: string, options: RequestInit, retries: number
   }
 }
 
-// Add interface for Astria API response
-interface AstriaPromptResult {
-  promptIndex?: number;
-  id?: number;
-  text?: string;
-  images?: string[];
-  steps?: number;
-  tune_id?: number;
-  created_at?: string;
-  trained_at?: string;
-  updated_at?: string;
-  negative_prompt?: string;
-  started_training_at?: string;
-  error?: boolean;
-  isBackup?: boolean;
-}
+// Single delay constant for rate limiting
+const DELAY = 1000; // 1 second between API calls
 
 /// Function to create prompts
 export async function createPrompt(userData: any) {
   const user = userData[0];
-  const { id, planType, isBackupPrompt, backupCount } = user;
-
-  console.log('Starting createPrompt with config:', {
-    userId: id,
-    planType,
-    isBackupPrompt,
-    backupCount
-  });
+  const { id, planType } = user;
 
   const API_URL = `https://api.astria.ai/tunes/1504944/prompts`;
   const webhookSecret = process.env.APP_WEBHOOK_SECRET;
 
   const prompts = getPromptsAttributes(user);
-  console.log('Generated prompts array length:', prompts.length);
-  console.log('Full prompts array:', JSON.stringify(prompts, null, 2));
+  const results = [];
 
-  // For backup prompts, we'll use a smaller set
-  const REQUIRED_PROMPT_COUNT = isBackupPrompt ? (backupCount || 5) : 10;
-  
-  // For backup prompts, we'll use the first N prompts
-  const selectedPrompts = isBackupPrompt 
-    ? prompts.slice(0, REQUIRED_PROMPT_COUNT)
-    : prompts;
-
-  console.log('Selected prompts for processing:', {
-    total: selectedPrompts.length,
-    required: REQUIRED_PROMPT_COUNT,
-    isBackup: isBackupPrompt,
-    prompts: selectedPrompts.map((p: { text: string }, i: number) => ({ index: i, text: p.text }))
-  });
-
-  if (selectedPrompts.length < REQUIRED_PROMPT_COUNT) {
-    console.error(`Invalid number of prompts generated. Expected ${REQUIRED_PROMPT_COUNT}, got ${selectedPrompts.length}`);
-    throw new Error(`Must generate exactly ${REQUIRED_PROMPT_COUNT} prompts`);
-  }
-
-  console.log(`Generated ${selectedPrompts.length} ${isBackupPrompt ? 'backup ' : ''}prompts for processing`);
-  
-  const results: AstriaPromptResult[] = [];
-  const failedPrompts: Array<{ index: number; prompt: string; error: string }> = [];
-  const pendingPrompts = new Set<number>();
-
-  // For backup prompts, we'll request 2 images per prompt to increase chances
-  const baseImagesPerPrompt = planType === "basic" ? 1 
+  // Images per prompt based on plan type, will be multiplied by 10 prompts
+  const targetImagesPerPrompt = planType === "basic" ? 1 
     : planType === "professional" ? 10 
     : planType === "executive" ? 20 
     : 1;
 
-  const targetImagesPerPrompt = isBackupPrompt 
-    ? Math.min(baseImagesPerPrompt * 2, 8) // Double the images but cap at 8
-    : baseImagesPerPrompt;
+  // Process prompts
+  for (let promptIndex = 0; promptIndex < prompts.length; promptIndex++) {
+    const prompt = prompts[promptIndex];
+    try {
+      console.log(`Processing prompt ${promptIndex + 1}/${prompts.length}`);
+      
+      const numberOfCalls = Math.ceil(targetImagesPerPrompt / 8);
+      let remainingImages = targetImagesPerPrompt;
 
-  const GLOBAL_MAX_RETRIES = isBackupPrompt ? 3 : 5; // Fewer retries for backup prompts
-  let globalRetryCount = 0;
+      // Multiple API calls for each prompt if needed
+      for (let i = 0; i < numberOfCalls; i++) {
+        const imagesThisCall = Math.min(8, remainingImages);
+        remainingImages -= imagesThisCall;
+        
+        const form = new FormData();
+        form.append('prompt[text]', prompt.text);
+        form.append('prompt[callback]', `https://www.youphotoshoot.com/api/llm/prompt-webhook?webhook_secret=${webhookSecret}&user_id=${id}`);
+        form.append('prompt[num_images]', imagesThisCall.toString());
 
-  // Track successful prompts across retries
-  const successfulPromptIndexes = new Set<number>();
+        const response = await fetchWithRetry(API_URL, {
+          method: 'POST',
+          headers: headers,
+          body: form
+        });
 
-  while (successfulPromptIndexes.size < REQUIRED_PROMPT_COUNT && globalRetryCount < GLOBAL_MAX_RETRIES) {
-    if (globalRetryCount > 0) {
-      console.log(`Global retry attempt ${globalRetryCount + 1}`);
-      failedPrompts.length = 0;
-    }
+        const result = await response.json();
+        results.push(result);
 
-    // Process prompts with retries
-    for (let promptIndex = 0; promptIndex < selectedPrompts.length; promptIndex++) {
-      if (successfulPromptIndexes.has(promptIndex)) {
-        console.log(`Skipping prompt ${promptIndex + 1} as it was already successful`);
-        continue;
-      }
-
-      const prompt = selectedPrompts[promptIndex];
-      let retryCount = 0;
-      let success = false;
-
-      console.log(`Processing ${isBackupPrompt ? 'backup ' : ''}prompt ${promptIndex + 1}/${selectedPrompts.length}: ${prompt.text}`);
-
-      while (!success && retryCount < MAX_RETRIES) {
-        try {
-          console.log(`Attempt ${retryCount + 1} for prompt ${promptIndex + 1}`, {
-            promptText: prompt.text,
-            targetImagesPerPrompt,
-            isBackupPrompt
-          });
-          
-          const numberOfCalls = Math.ceil(targetImagesPerPrompt / 8);
-          let remainingImages = targetImagesPerPrompt;
-
-          console.log('API call configuration:', {
-            numberOfCalls,
-            remainingImages,
-            promptIndex,
-            maxImagesPerCall: 8
-          });
-
-          for (let i = 0; i < numberOfCalls; i++) {
-            const imagesThisCall = Math.min(8, remainingImages);
-            remainingImages -= imagesThisCall;
-            
-            const form = new FormData();
-            form.append('prompt[text]', prompt.text);
-            form.append('prompt[callback]', `https://www.youphotoshoot.com/api/llm/prompt-webhook?webhook_secret=${webhookSecret}&user_id=${id}&prompt_index=${promptIndex}&is_backup=${isBackupPrompt ? '1' : '0'}`);
-            form.append('prompt[num_images]', imagesThisCall.toString());
-
-            console.log(`API call details for prompt ${promptIndex + 1}, batch ${i + 1}:`, {
-              promptText: prompt.text,
-              imagesRequested: imagesThisCall,
-              remainingImages,
-              callNumber: i + 1,
-              totalCalls: numberOfCalls
-            });
-
-            const response = await fetchWithRetry(API_URL, {
-              method: 'POST',
-              headers: headers,
-              body: form
-            });
-
-            const result = await response.json();
-            console.log(`Astria API response for prompt ${promptIndex + 1}, batch ${i + 1}:`, result);
-            
-            if (!result || result.error || !result.id) {
-              throw new Error(`Invalid response from Astria API: ${JSON.stringify(result)}`);
-            }
-            
-            result.promptIndex = promptIndex;
-            result.isBackup = isBackupPrompt;
-            results.push(result);
-            pendingPrompts.add(promptIndex);
-            console.log(`Successfully queued ${isBackupPrompt ? 'backup ' : ''}prompt ${promptIndex + 1}, attempt ${retryCount + 1}`);
-            console.log(`Current pending prompts: ${pendingPrompts.size}`);
-
-            if (i < numberOfCalls - 1 || promptIndex < selectedPrompts.length - 1) {
-              const delayTime = DELAY * (isBackupPrompt ? 3 : 2); // Longer delay for backup prompts
-              console.log(`Waiting ${delayTime}ms before next API call...`);
-              await sleep(delayTime);
-            }
-          }
-          
-          success = true;
-        } catch (error) {
-          console.error(`Error processing ${isBackupPrompt ? 'backup ' : ''}prompt ${promptIndex + 1} (attempt ${retryCount + 1}):`, error);
-          retryCount++;
-          
-          if (retryCount < MAX_RETRIES) {
-            const delayTime = RETRY_DELAY * Math.pow(2, retryCount);
-            console.log(`Retrying prompt ${promptIndex + 1} in ${delayTime}ms...`);
-            await sleep(delayTime);
-          } else {
-            console.error(`Failed to process prompt ${promptIndex + 1} after ${MAX_RETRIES} attempts`);
-            failedPrompts.push({
-              index: promptIndex,
-              prompt: prompt.text,
-              error: error instanceof Error ? error.message : 'Unknown error'
-            });
-          }
+        // Simple 1s delay between any API calls
+        if (i < numberOfCalls - 1 || promptIndex < prompts.length - 1) {
+          await sleep(DELAY);
         }
       }
-    }
-
-    // Wait for pending prompts to complete or timeout
-    const WAIT_TIMEOUT = isBackupPrompt ? 120000 : 180000; // 2 minutes for backup, 3 minutes for regular
-    const startTime = Date.now();
-    
-    while (pendingPrompts.size > 0 && Date.now() - startTime < WAIT_TIMEOUT) {
-      await sleep(5000);
-      console.log(`Waiting for ${pendingPrompts.size} ${isBackupPrompt ? 'backup ' : ''}pending prompts...`);
-    }
-
-    if (successfulPromptIndexes.size < REQUIRED_PROMPT_COUNT) {
-      globalRetryCount++;
-      if (globalRetryCount < GLOBAL_MAX_RETRIES) {
-        const delayTime = RETRY_DELAY * Math.pow(2, globalRetryCount);
-        console.log(`Not all ${isBackupPrompt ? 'backup ' : ''}prompts were successful (${successfulPromptIndexes.size}/${REQUIRED_PROMPT_COUNT}). Starting global retry ${globalRetryCount + 1} in ${delayTime}ms...`);
-        await sleep(delayTime);
+    } catch (error) {
+      console.error(`Error processing prompt ${promptIndex + 1}:`, error);
+      if (error instanceof Error) {
+        return { error: true, message: error.message };
       }
+      return { error: true, message: 'An unknown error occurred' };
     }
   }
 
-  console.log(`${isBackupPrompt ? 'Backup prompt' : 'Prompt'} processing summary:`, {
-    totalPrompts: selectedPrompts.length,
-    successfulPrompts: successfulPromptIndexes.size,
-    pendingPrompts: pendingPrompts.size,
-    failedPrompts: failedPrompts.length,
-    failedDetails: failedPrompts,
-    globalRetries: globalRetryCount,
-    successfulPromptIndexes: Array.from(successfulPromptIndexes),
-    isBackup: isBackupPrompt
-  });
-
+  console.log('All prompts initiated successfully:', results);
   return results;
 }
 

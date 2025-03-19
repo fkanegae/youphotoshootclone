@@ -3,37 +3,13 @@ import getUser from "@/action/getUser";
 import { redirect } from "next/navigation";
 import { createTune } from "@/app/api/llm/tune/createTune";
 import { sendEmail } from "@/action/sendEmail";
-import { createClient } from "@/utils/supabase/server";
 
 export default async function Page() {
   const userData = await getUser();
 
   // Check if userData is valid and workStatus is "ongoing" with apiStatus not empty or null
   if (userData && userData.length > 0) {
-    const { workStatus, apiStatus, tuneStatus, email, promptsResult } = userData[0];
-
-    // Check if we have any images in promptsResult
-    const totalImages = promptsResult?.reduce((sum: number, result: any) => 
-      sum + (result.data?.prompt?.images?.length || 0), 0
-    ) || 0;
-
-    // Force update workStatus if we have images but status is still ongoing
-    if (workStatus === "ongoing" && totalImages > 0) {
-      const supabase = createClient();
-      try {
-        await supabase
-          .from('userTable')
-          .update({ 
-            workStatus: "partial"
-          })
-          .eq('id', userData[0].id);
-        
-        // Redirect to dashboard since we have images
-        redirect("/dashboard");
-      } catch (error) {
-        console.error('Error updating workStatus:', error);
-      }
-    }
+    const { workStatus, apiStatus, tuneStatus, email } = userData[0];
 
     if (
       workStatus === "ongoing" &&
@@ -66,7 +42,7 @@ export default async function Page() {
     if (userData && userData.length > 0) {
       const { workStatus } = userData[0];
 
-      if (workStatus === "completed" || workStatus === "partial") {
+      if (workStatus === "completed") {
         redirect("/dashboard");
       } else if (workStatus === "ongoing") {
         // Do nothing, continue to render the waiting page

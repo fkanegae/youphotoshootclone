@@ -1,118 +1,56 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { createPrompt } from "../prompt/createPrompt";
 export const dynamic = "force-dynamic";
 
-// Environment variables for Supabase and webhook secret
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const appWebhookSecret = process.env.APP_WEBHOOK_SECRET;
+// Environment variables for Supabase and webhook secret1
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL; // Supabase URL
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY; // Supabase service role key
+const appWebhookSecret = process.env.APP_WEBHOOK_SECRET; // Webhook secret for authentication
 
 // Check for required environment variables
 if (!supabaseUrl) {
-  throw new Error("MISSING NEXT_PUBLIC_SUPABASE_URL!");
+  throw new Error("MISSING NEXT_PUBLIC_SUPABASE_URL!"); // Error if Supabase URL is missing
 }
 
 if (!supabaseServiceRoleKey) {
-  throw new Error("MISSING SUPABASE_SERVICE_ROLE_KEY!");
+  throw new Error("MISSING SUPABASE_SERVICE_ROLE_KEY!"); // Error if service role key is missing
 }
 
 if (!appWebhookSecret) {
-  throw new Error("MISSING APP_WEBHOOK_SECRET!");
-}
-
-// Constants for retry mechanism
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second
-
-// Helper function to validate image URLs
-async function validateImageUrls(images: string[]): Promise<string[]> {
-  const validImages = await Promise.all(
-    images.map(async (url) => {
-      try {
-        const response = await fetch(url, { method: 'HEAD' });
-        return response.ok ? url : null;
-      } catch (error) {
-        console.error(`Error validating image URL ${url}:`, error);
-        return null;
-      }
-    })
-  );
-  return validImages.filter((url): url is string => url !== null);
-}
-
-// Helper function to sleep
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-// Helper function to get allowed prompts based on plan type
-function getAllowedPrompts(planType: string): number {
-  switch (planType.toLowerCase()) {
-    case 'professional':
-      return 100;
-    case 'executive':
-      return 200;
-    case 'basic':
-    default:
-      return 10;
-  }
-}
-
-// Helper function to update user data with retries
-async function updateUserData(supabase: any, user_id: string, updateObject: any, retryCount = 0) {
-  try {
-    const { data: userUpdated, error: userUpdatedError } = await supabase
-      .from('userTable')
-      .update(updateObject)
-      .eq('id', user_id);
-
-    if (userUpdatedError) throw userUpdatedError;
-    return userUpdated;
-  } catch (error) {
-    if (retryCount < MAX_RETRIES) {
-      console.log(`Retrying updateUserData (${retryCount + 1}/${MAX_RETRIES})...`);
-      await sleep(RETRY_DELAY * Math.pow(2, retryCount));
-      return updateUserData(supabase, user_id, updateObject, retryCount + 1);
-    }
-    throw error;
-  }
-}
-
-// Interface for prompt result
-interface PromptResult {
-  timestamp: string;
-  promptIndex: number;
-  data: {
-    prompt: {
-      id: number;
-      text: string;
-      images: string[];
-      [key: string]: any;
-    };
-    [key: string]: any;
-  };
+  throw new Error("MISSING APP_WEBHOOK_SECRET!"); // Error if webhook secret is missing
 }
 
 export async function POST(request: Request) {
-  // Parse incoming JSON data
-  const incomingData = await request.json() as any;
 
-  // Extract parameters from the request URL
+  // Parse incoming JSON data as unknown
+  const incomingData = await request.json() as unknown;
+
+
+  // Extract user_id and webhook_secret from the request URL
   const urlObj = new URL(request.url);
   const user_id = urlObj.searchParams.get("user_id");
   const webhook_secret = urlObj.searchParams.get("webhook_secret");
-  const prompt_index = urlObj.searchParams.get("prompt_index");
 
-  // Enhanced validation
-  if (!webhook_secret || !user_id || prompt_index === null) {
-    console.error('Missing required parameters:', { webhook_secret, user_id, prompt_index });
+
+  // Check for webhook_secret in the URL
+  if (!webhook_secret) {
     return NextResponse.json(
-      { message: "Missing required parameters" },
+      { message: "Malformed URL, no webhook_secret detected!" },
       { status: 400 }
     );
   }
 
+  // Validate the webhook_secret against the stored secret
   if (webhook_secret.toLowerCase() !== appWebhookSecret?.toLowerCase()) {
     return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
+  }
+
+  // Check for user_id in the URL
+  if (!user_id) {
+    return NextResponse.json(
+      { message: "Malformed URL, no user_id detected!" },
+      { status: 400 }
+    );
   }
 
   // Create a Supabase client
@@ -128,201 +66,124 @@ export async function POST(request: Request) {
     }
   );
 
-  // Function to get user data with retries
-  async function getUserData(supabase: any, user_id: string, retryCount = 0): Promise<any> {
-    try {
-      const { data: userData, error: userError } = await supabase
-        .from('userTable')
-        .select('*')
-        .eq('id', user_id)
-        .single();
+  // Fetch user data from the custom userTable
+  const { data: userData, error: userError } = await supabase
+    .from('userTable')
+    .select('*')
+    .eq('id', user_id)
+    .single();
 
-      if (userError) throw userError;
-      if (!userData) throw new Error('User not found');
-      
-      return userData;
-    } catch (error) {
-      if (retryCount < MAX_RETRIES) {
-        console.log(`Retrying getUserData (${retryCount + 1}/${MAX_RETRIES})...`);
-        await sleep(RETRY_DELAY * Math.pow(2, retryCount));
-        return getUserData(supabase, user_id, retryCount + 1);
-      }
-      throw error;
-    }
+  // Add debug logging for user data
+  console.log('User data from userTable:', JSON.stringify(userData, null, 2));
+
+  // Handle errors in fetching user
+  if (userError) {
+    console.error('Error fetching user from userTable:', userError);
+    return NextResponse.json(
+      {
+        message: userError.message,
+      },
+      { status: 401 }
+    );
   }
 
+  // Check if user exists
+  if (!userData) {
+    console.log('User not found in userTable');
+    return NextResponse.json(
+      {
+        message: "Unauthorized",
+      },
+      { status: 401 }
+    );
+  }
+
+  // Update this function to return different values based on plan type
+  const getAllowedPrompts = (planType: string): number => {
+    switch (planType.toLowerCase()) {
+      case 'professional':
+        return 100;
+      case 'executive':
+        return 200;
+      case 'basic':
+      default:
+        return 10;
+    }
+  };
+
   try {
-    // Get user data with retries
-    const userData = await getUserData(supabase, user_id);
-    console.log('User data from userTable:', JSON.stringify(userData, null, 2));
+    console.log('Incoming webhook data:', JSON.stringify(incomingData, null, 2));
 
     const timestamp = new Date().toISOString();
-    
-    // Validate incoming data has images
-    if (!incomingData?.prompt?.images || !Array.isArray(incomingData.prompt.images)) {
-      console.error('Invalid webhook data - missing or invalid images array:', incomingData);
-      return NextResponse.json(
-        { message: "Invalid webhook data - missing images" },
-        { status: 400 }
-      );
-    }
+    const newPromptResult = { timestamp, data: incomingData };
 
-    // Validate image URLs
-    const validatedImages = await validateImageUrls(incomingData.prompt.images);
-    if (validatedImages.length === 0) {
-      console.error('No valid images found in webhook data');
-      return NextResponse.json(
-        { message: "No valid images in webhook data" },
-        { status: 400 }
-      );
-    }
-
-    // Get the current promptsResult array or initialize it
+    // Get the current promptsResult array or initialize it if it doesn't exist
     const currentPromptsResult = Array.isArray(userData.promptsResult) 
       ? userData.promptsResult 
       : [];
 
-    // Create new prompt result with validated images and prompt index
-    const newPromptResult = {
-      timestamp,
-      promptIndex: parseInt(prompt_index),
-      data: {
-        ...incomingData,
-        prompt: {
-          ...incomingData.prompt,
-          images: validatedImages
-        }
-      }
-    };
+    console.log('Current promptsResult:', JSON.stringify(currentPromptsResult, null, 2));
 
-    // Check if we already have a result for this prompt index
-    const existingIndex = currentPromptsResult.findIndex(
-      (result: PromptResult) => result.promptIndex === parseInt(prompt_index)
-    );
+    // Add the new prompt result to the array
+    const updatedPromptsResult = [...currentPromptsResult, newPromptResult];
 
-    let updatedPromptsResult;
-    if (existingIndex >= 0) {
-      // Update existing prompt result
-      updatedPromptsResult = [...currentPromptsResult];
-      updatedPromptsResult[existingIndex] = newPromptResult;
-    } else {
-      // Add new prompt result
-      updatedPromptsResult = [...currentPromptsResult, newPromptResult];
-    }
+    console.log('Updated promptsResult:', JSON.stringify(updatedPromptsResult, null, 2));
 
-    // Get the user's plan type and calculate limits
+    // Get the user's plan type and check prompt limit
     const userPlanType = userData.planType || 'basic';
     const allowedPrompts = getAllowedPrompts(userPlanType);
-    const targetImagesPerPrompt = userPlanType === "basic" ? 1 
-      : userPlanType === "professional" ? 10 
-      : userPlanType === "executive" ? 20 
-      : 1;
+    const currentPromptCount = updatedPromptsResult.length;
 
-    // Calculate total required images
-    const totalRequiredImages = allowedPrompts * targetImagesPerPrompt;
+    console.log("User plan type:", userPlanType);
+    console.log("Allowed prompts:", allowedPrompts);
+    console.log("Current prompt count:", currentPromptCount);
 
-    // Calculate current totals
-    const uniquePromptIndexes = new Set(updatedPromptsResult.map(r => r.promptIndex));
-    const totalPrompts = uniquePromptIndexes.size;
-    const totalImages = updatedPromptsResult.reduce((sum, prompt) => 
-      sum + (prompt.data.prompt.images?.length || 0), 0
-    );
+    if (currentPromptCount > allowedPrompts) {
+      return NextResponse.json(
+        {
+          message: "Prompt limit exceeded for your plan.",
+        },
+        { status: 403 }
+      );
+    }
 
-    console.log('Progress update:', {
-      promptIndex: prompt_index,
-      totalPrompts,
-      totalImages,
-      requiredPrompts: allowedPrompts,
-      requiredImages: totalRequiredImages,
-      validImagesInThisPrompt: validatedImages.length
-    });
+    // Check if this is the last allowed prompt
+    const isLastAllowedPrompt = currentPromptCount === allowedPrompts;
 
     // Prepare the update object
-    const updateObject: { 
-      promptsResult: any[]; 
-      workStatus?: string;
-      backupPromptsTriggered?: boolean 
-    } = {
+    const updateObject: { promptsResult: any[]; workStatus?: string } = {
       promptsResult: updatedPromptsResult
     };
 
-    // More aggressive workStatus update - if we have any images and status is ongoing, mark as partial
+    // If current workStatus is "ongoing", change it to "complete"
     if (userData.workStatus === 'ongoing') {
-      // Always update workStatus if we have any images
-      if (totalImages > 0) {
-        updateObject.workStatus = totalImages >= totalRequiredImages ? 'complete' : 'partial';
-        console.log(`Updating workStatus to ${updateObject.workStatus}. Images: ${totalImages}/${totalRequiredImages}`);
-      }
-      
-      // Log detailed status for debugging
-      console.log('Current status:', {
-        currentWorkStatus: userData.workStatus,
-        hasImages: totalImages > 0,
-        totalImages,
-        requiredImages: totalRequiredImages,
-        promptsReceived: totalPrompts,
-        uniquePromptIndexes: Array.from(uniquePromptIndexes),
-        updatingTo: updateObject.workStatus || 'no change'
-      });
+      updateObject.workStatus = 'complete';
+      console.log("Work status changed from ongoing to complete");
     }
 
-    // Check if we need to generate backup prompts
-    const BACKUP_THRESHOLD_TIME = 60000; // 1 minute
-    const shouldTriggerBackup = 
-      userData.workStatus === 'ongoing' && 
-      totalImages < totalRequiredImages && 
-      !userData.backupPromptsTriggered && 
-      Date.now() - new Date(userData.updatedAt).getTime() > BACKUP_THRESHOLD_TIME;
+    console.log("updateObject:", JSON.stringify(updateObject, null, 2));
 
-    if (shouldTriggerBackup) {
-      console.log('Triggering backup prompts due to insufficient images:', {
-        currentImages: totalImages,
-        requiredImages: totalRequiredImages
-      });
+    // Update promptsResult and potentially workStatus in the database
+    const { data: userUpdated, error: userUpdatedError } = await supabase
+      .from('userTable')
+      .update(updateObject)
+      .eq('id', user_id);
 
-      try {
-        // Mark that we've triggered backup prompts to prevent multiple triggers
-        await updateUserData(supabase, user_id, {
-          ...updateObject,
-          backupPromptsTriggered: true
-        });
-
-        // Create 5 more prompts
-        const backupResult = await createPrompt([{
-          ...userData,
-          isBackupPrompt: true, // Flag to indicate these are backup prompts
-          backupCount: 5 // Number of backup prompts to generate
-        }]);
-
-        console.log('Backup prompts created:', backupResult);
-      } catch (error) {
-        console.error('Error creating backup prompts:', error);
-        // Don't throw the error - we still want to process the current webhook
-      }
-    }
-
-    // Update database with retries
-    const userUpdated = await updateUserData(supabase, user_id, updateObject);
-
-    // Prepare response data
-    const responseData = {
-      message: "Webhook Callback Success!",
-      userId: user_id,
-      promptIndex: prompt_index,
-      totalPrompts,
-      totalImages,
-      requiredPrompts: allowedPrompts,
-      requiredImages: totalRequiredImages,
-      isComplete: totalPrompts >= allowedPrompts && totalImages >= totalRequiredImages,
-      workStatus: updateObject.workStatus || userData.workStatus
-    };
+    // Log success response
+    console.log("Success response:", { message: "success", userId: user_id, userUpdated, isLastAllowedPrompt });
     
-    console.log("Success response:", JSON.stringify(responseData, null, 2));
-    return NextResponse.json(responseData, { status: 200 });
+    return NextResponse.json(
+      {
+        message: `Webhook Callback Success! User ID: ${user_id}, User Updated: ${userUpdated ? 'Yes' : 'No'}, Last Allowed Prompt: ${isLastAllowedPrompt}`,
+      },
+      { status: 200, statusText: "Success" }
+    );
   } catch (e) {
     console.error('Error processing webhook:', e);
     return NextResponse.json(
-      { message: "Something went wrong!", error: String(e) },
+      {
+        message: "Something went wrong!",
+      },
       { status: 500 }
     );
   }

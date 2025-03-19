@@ -22,17 +22,6 @@ if (!appWebhookSecret) {
   throw new Error("MISSING APP_WEBHOOK_SECRET!"); // Error if webhook secret is missing
 }
 
-// Add error interface before the POST function
-interface AstriaError {
-  error: true;
-  message: string;
-}
-
-// Add type guard function
-function isAstriaError(result: any): result is AstriaError {
-  return result && typeof result === 'object' && 'error' in result && 'message' in result;
-}
-
 export async function POST(request: Request) {
   // Define the structure of incoming tune data
   type TuneData = {
@@ -162,7 +151,7 @@ export async function POST(request: Request) {
     console.log("Attempting to create prompts...");
     const promptResults = await createPrompt([userData]);
 
-    if (isAstriaError(promptResults)) {
+    if ('error' in promptResults && promptResults.error) {
       console.error("Error creating prompts:", promptResults.message);
       return NextResponse.json(
         {
