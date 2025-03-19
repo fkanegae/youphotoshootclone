@@ -62,6 +62,13 @@ export async function createPrompt(userData: any) {
   const webhookSecret = process.env.APP_WEBHOOK_SECRET;
 
   const prompts = getPromptsAttributes(user);
+  const REQUIRED_PROMPT_COUNT = 10; // Hardcoded requirement for exactly 10 prompts
+  
+  if (prompts.length !== REQUIRED_PROMPT_COUNT) {
+    console.error(`Invalid number of prompts generated. Expected ${REQUIRED_PROMPT_COUNT}, got ${prompts.length}`);
+    throw new Error(`Must generate exactly ${REQUIRED_PROMPT_COUNT} prompts`);
+  }
+
   console.log(`Generated ${prompts.length} prompts for processing`);
   
   const results: AstriaPromptResult[] = [];
@@ -74,10 +81,13 @@ export async function createPrompt(userData: any) {
     : planType === "executive" ? 20 
     : 1;
 
-  const GLOBAL_MAX_RETRIES = 3; // Maximum number of times to retry the entire prompt set
+  const GLOBAL_MAX_RETRIES = 5; // Increased from 3 to 5 for more persistence
   let globalRetryCount = 0;
 
-  while (totalSuccessfulPrompts < prompts.length && globalRetryCount < GLOBAL_MAX_RETRIES) {
+  // Track successful prompts across retries
+  const successfulPromptIndexes = new Set<number>();
+
+  while (successfulPromptIndexes.size < REQUIRED_PROMPT_COUNT && globalRetryCount < GLOBAL_MAX_RETRIES) {
     // Clear previous results if this is a retry
     if (globalRetryCount > 0) {
       console.log(`Global retry attempt ${globalRetryCount + 1}`);
@@ -88,7 +98,8 @@ export async function createPrompt(userData: any) {
     // Process prompts with retries
     for (let promptIndex = 0; promptIndex < prompts.length; promptIndex++) {
       // Skip prompts that were already successful in previous attempts
-      if (results.some(r => r.promptIndex === promptIndex)) {
+      if (successfulPromptIndexes.has(promptIndex)) {
+        console.log(`Skipping prompt ${promptIndex + 1} as it was already successful`);
         continue;
       }
 
@@ -115,7 +126,7 @@ export async function createPrompt(userData: any) {
             form.append('prompt[callback]', `https://www.youphotoshoot.com/api/llm/prompt-webhook?webhook_secret=${webhookSecret}&user_id=${id}`);
             form.append('prompt[num_images]', imagesThisCall.toString());
 
-            console.log(`Sending request for ${imagesThisCall} images`);
+            console.log(`Sending request for ${imagesThisCall} images for prompt ${promptIndex + 1}`);
 
             const response = await fetchWithRetry(API_URL, {
               method: 'POST',
@@ -125,20 +136,23 @@ export async function createPrompt(userData: any) {
 
             const result = await response.json();
             
-            // Validate the result
-            if (!result || result.error) {
+            // Enhanced result validation
+            if (!result || result.error || !result.id) {
               throw new Error(`Invalid response from Astria API: ${JSON.stringify(result)}`);
             }
             
-            result.promptIndex = promptIndex; // Store the prompt index with the result
+            result.promptIndex = promptIndex;
             results.push(result);
             success = true;
-            totalSuccessfulPrompts++;
+            successfulPromptIndexes.add(promptIndex);
             console.log(`Successfully processed prompt ${promptIndex + 1}, attempt ${retryCount + 1}`);
+            console.log(`Current successful prompts: ${successfulPromptIndexes.size}/${REQUIRED_PROMPT_COUNT}`);
 
-            // Simple 1s delay between any API calls
+            // Increased delay between calls to prevent rate limiting
             if (i < numberOfCalls - 1 || promptIndex < prompts.length - 1) {
-              await sleep(DELAY);
+              const delayTime = DELAY * 2; // Doubled the delay
+              console.log(`Waiting ${delayTime}ms before next API call...`);
+              await sleep(delayTime);
             }
           }
         } catch (error) {
@@ -146,7 +160,7 @@ export async function createPrompt(userData: any) {
           retryCount++;
           
           if (retryCount < MAX_RETRIES) {
-            const delayTime = RETRY_DELAY * Math.pow(2, retryCount - 1); // Exponential backoff
+            const delayTime = RETRY_DELAY * Math.pow(2, retryCount); // Increased exponential backoff
             console.log(`Retrying prompt ${promptIndex + 1} in ${delayTime}ms...`);
             await sleep(delayTime);
           } else {
@@ -161,37 +175,56 @@ export async function createPrompt(userData: any) {
       }
     }
 
-    // If we still don't have all prompts, increment global retry counter
-    if (totalSuccessfulPrompts < prompts.length) {
+    // Verify we have the correct number of successful prompts
+    if (successfulPromptIndexes.size < REQUIRED_PROMPT_COUNT) {
       globalRetryCount++;
       if (globalRetryCount < GLOBAL_MAX_RETRIES) {
-        console.log(`Not all prompts were successful (${totalSuccessfulPrompts}/${prompts.length}). Starting global retry ${globalRetryCount + 1}...`);
-        await sleep(RETRY_DELAY * Math.pow(2, globalRetryCount)); // Exponential backoff for global retries
+        const delayTime = RETRY_DELAY * Math.pow(2, globalRetryCount);
+        console.log(`Not all prompts were successful (${successfulPromptIndexes.size}/${REQUIRED_PROMPT_COUNT}). Starting global retry ${globalRetryCount + 1} in ${delayTime}ms...`);
+        await sleep(delayTime);
       }
     }
   }
 
-  // Log summary of processing
+  // Detailed logging of results
   console.log('Prompt processing summary:', {
     totalPrompts: prompts.length,
-    successfulPrompts: totalSuccessfulPrompts,
+    successfulPrompts: successfulPromptIndexes.size,
     failedPrompts: failedPrompts.length,
     failedDetails: failedPrompts,
-    globalRetries: globalRetryCount
+    globalRetries: globalRetryCount,
+    successfulPromptIndexes: Array.from(successfulPromptIndexes)
   });
 
-  // If we don't have all prompts after all retries, return error
-  if (totalSuccessfulPrompts < prompts.length) {
+  // Strict validation of results
+  if (successfulPromptIndexes.size < REQUIRED_PROMPT_COUNT) {
     console.error(`Failed to process all prompts after ${GLOBAL_MAX_RETRIES} global retries`);
+    console.error('Missing prompt indexes:', Array.from({ length: REQUIRED_PROMPT_COUNT })
+      .map((_, i) => i)
+      .filter(i => !successfulPromptIndexes.has(i)));
+    
     return { 
       error: true, 
-      message: `Failed to process ${prompts.length - totalSuccessfulPrompts} prompts after all retries`, 
+      message: `Failed to process ${REQUIRED_PROMPT_COUNT - successfulPromptIndexes.size} prompts after all retries`, 
       failedPrompts,
-      results // Include successful results so they're not lost
+      results,
+      successfulCount: successfulPromptIndexes.size
     };
   }
 
-  console.log('All prompts initiated successfully:', results);
-  return results;
+  // Verify each result has the necessary data
+  const validResults = results.filter(result => result && result.id && result.promptIndex !== undefined);
+  if (validResults.length !== REQUIRED_PROMPT_COUNT) {
+    console.error(`Invalid results count. Expected ${REQUIRED_PROMPT_COUNT}, got ${validResults.length}`);
+    return {
+      error: true,
+      message: `Invalid number of results: ${validResults.length}/${REQUIRED_PROMPT_COUNT}`,
+      results: validResults
+    };
+  }
+
+  console.log(`Successfully processed all ${REQUIRED_PROMPT_COUNT} prompts:`, 
+    validResults.map(r => ({ promptIndex: r.promptIndex, id: r.id })));
+  return validResults;
 }
 
