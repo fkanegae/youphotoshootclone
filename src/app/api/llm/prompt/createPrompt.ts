@@ -59,10 +59,20 @@ export async function createPrompt(userData: any) {
   const user = userData[0];
   const { id, planType, isBackupPrompt, backupCount } = user;
 
+  console.log('Starting createPrompt with config:', {
+    userId: id,
+    planType,
+    isBackupPrompt,
+    backupCount
+  });
+
   const API_URL = `https://api.astria.ai/tunes/1504944/prompts`;
   const webhookSecret = process.env.APP_WEBHOOK_SECRET;
 
   const prompts = getPromptsAttributes(user);
+  console.log('Generated prompts array length:', prompts.length);
+  console.log('Full prompts array:', JSON.stringify(prompts, null, 2));
+
   // For backup prompts, we'll use a smaller set
   const REQUIRED_PROMPT_COUNT = isBackupPrompt ? (backupCount || 5) : 10;
   
@@ -70,6 +80,13 @@ export async function createPrompt(userData: any) {
   const selectedPrompts = isBackupPrompt 
     ? prompts.slice(0, REQUIRED_PROMPT_COUNT)
     : prompts;
+
+  console.log('Selected prompts for processing:', {
+    total: selectedPrompts.length,
+    required: REQUIRED_PROMPT_COUNT,
+    isBackup: isBackupPrompt,
+    prompts: selectedPrompts.map((p: { text: string }, i: number) => ({ index: i, text: p.text }))
+  });
 
   if (selectedPrompts.length < REQUIRED_PROMPT_COUNT) {
     console.error(`Invalid number of prompts generated. Expected ${REQUIRED_PROMPT_COUNT}, got ${selectedPrompts.length}`);
@@ -119,10 +136,21 @@ export async function createPrompt(userData: any) {
 
       while (!success && retryCount < MAX_RETRIES) {
         try {
-          console.log(`Attempt ${retryCount + 1} for prompt ${promptIndex + 1}`);
+          console.log(`Attempt ${retryCount + 1} for prompt ${promptIndex + 1}`, {
+            promptText: prompt.text,
+            targetImagesPerPrompt,
+            isBackupPrompt
+          });
           
           const numberOfCalls = Math.ceil(targetImagesPerPrompt / 8);
           let remainingImages = targetImagesPerPrompt;
+
+          console.log('API call configuration:', {
+            numberOfCalls,
+            remainingImages,
+            promptIndex,
+            maxImagesPerCall: 8
+          });
 
           for (let i = 0; i < numberOfCalls; i++) {
             const imagesThisCall = Math.min(8, remainingImages);
@@ -133,7 +161,13 @@ export async function createPrompt(userData: any) {
             form.append('prompt[callback]', `https://www.youphotoshoot.com/api/llm/prompt-webhook?webhook_secret=${webhookSecret}&user_id=${id}&prompt_index=${promptIndex}&is_backup=${isBackupPrompt ? '1' : '0'}`);
             form.append('prompt[num_images]', imagesThisCall.toString());
 
-            console.log(`Sending request for ${imagesThisCall} images for ${isBackupPrompt ? 'backup ' : ''}prompt ${promptIndex + 1}`);
+            console.log(`API call details for prompt ${promptIndex + 1}, batch ${i + 1}:`, {
+              promptText: prompt.text,
+              imagesRequested: imagesThisCall,
+              remainingImages,
+              callNumber: i + 1,
+              totalCalls: numberOfCalls
+            });
 
             const response = await fetchWithRetry(API_URL, {
               method: 'POST',
@@ -142,6 +176,7 @@ export async function createPrompt(userData: any) {
             });
 
             const result = await response.json();
+            console.log(`Astria API response for prompt ${promptIndex + 1}, batch ${i + 1}:`, result);
             
             if (!result || result.error || !result.id) {
               throw new Error(`Invalid response from Astria API: ${JSON.stringify(result)}`);

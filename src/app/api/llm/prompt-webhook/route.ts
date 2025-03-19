@@ -246,6 +246,12 @@ export async function POST(request: Request) {
       promptsResult: updatedPromptsResult
     };
 
+    // Update work status when we have at least one image
+    if (userData.workStatus === 'ongoing' && totalImages > 0) {
+      updateObject.workStatus = totalImages >= totalRequiredImages ? 'complete' : 'partial';
+      console.log(`Work status changed to ${updateObject.workStatus}. Total images: ${totalImages}/${totalRequiredImages}`);
+    }
+
     // Check if we need to generate backup prompts
     const BACKUP_THRESHOLD_TIME = 60000; // 1 minute
     const shouldTriggerBackup = 
@@ -279,14 +285,6 @@ export async function POST(request: Request) {
         console.error('Error creating backup prompts:', error);
         // Don't throw the error - we still want to process the current webhook
       }
-    }
-
-    // Update work status only when we have all required images
-    if (userData.workStatus === 'ongoing' && 
-        totalPrompts >= allowedPrompts && 
-        totalImages >= totalRequiredImages) {
-      updateObject.workStatus = 'complete';
-      console.log(`Work status changed to complete. Total images: ${totalImages}/${totalRequiredImages}`);
     }
 
     // Update database with retries

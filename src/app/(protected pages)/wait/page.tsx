@@ -42,7 +42,7 @@ export default async function Page() {
     if (userData && userData.length > 0) {
       const { workStatus } = userData[0];
 
-      if (workStatus === "completed") {
+      if (workStatus === "completed" || workStatus === "partial") {
         redirect("/dashboard");
       } else if (workStatus === "ongoing") {
         // Do nothing, continue to render the waiting page
