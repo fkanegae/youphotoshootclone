@@ -115,10 +115,40 @@ export default function ImageGallery({
 
       if (hasDiscrepancy) {
         console.log("Fixing discrepancy...");
-        const updatedPrompts = await fixDiscrepancy(userData);
-        console.log("Discrepancy fix result:", !!updatedPrompts);
-        if (updatedPrompts) {
-          setPromptsResult(updatedPrompts);
+        let retryCount = 0;
+        const MAX_RETRIES = 5;
+        const RETRY_DELAY = 3000; // 3 seconds
+
+        while (retryCount < MAX_RETRIES) {
+          console.log(`Attempt ${retryCount + 1} to fix discrepancy`);
+          const updatedPrompts = await fixDiscrepancy(userData);
+          
+          if (updatedPrompts) {
+            const newTotalImages = updatedPrompts.reduce(
+              (total, result) => total + (result.data?.prompt?.images?.length || 0),
+              0
+            );
+            
+            console.log(`Retrieved ${newTotalImages}/${planLimit} images`);
+            
+            if (newTotalImages >= planLimit) {
+              console.log("Successfully retrieved all images");
+              setPromptsResult(updatedPrompts);
+              setIsLoading(false);
+              break;
+            }
+          }
+          
+          retryCount++;
+          if (retryCount < MAX_RETRIES) {
+            console.log(`Waiting ${RETRY_DELAY}ms before next attempt...`);
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+          }
+        }
+
+        if (retryCount === MAX_RETRIES) {
+          console.error("Failed to retrieve all images after maximum retries");
+          setIsLoading(false);
         }
       } else {
         console.log("No fix needed:", {
@@ -229,7 +259,7 @@ export default function ImageGallery({
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <div className="w-8 h-8 border-2 border-mainBlack/20 border-t-mainOrange rounded-full animate-spin mb-3" />
                 <p className="text-mainBlack/70 text-sm font-medium px-4 text-center">
-                  This photo is still generating, please come back in 1-2 hours.
+                  This photo is still generating, please come back in a few minutes.
                 </p>
               </div>
 

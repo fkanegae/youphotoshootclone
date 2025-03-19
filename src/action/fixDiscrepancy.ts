@@ -71,74 +71,94 @@ export async function fixDiscrepancy(userData: UserData | null) {
   console.log("Plan limit:", planLimit);
 
   if (currentImages < planLimit && userData.apiStatus?.id) {
-    try {
-      console.log("Fetching prompts from Astria...");
-      const astriaPrompts = await getAstriaPrompts(userData.apiStatus.id.toString());
-      
-      // Log unique images from Astria prompts
-      const uniqueAstriaImages = new Set(
-        astriaPrompts.flatMap(prompt => prompt.images || [])
-      );
-      console.log("Total unique Astria images:", uniqueAstriaImages.size);
+    let retryCount = 0;
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 2000; // 2 seconds
 
-      // Instead of filtering out existing prompts, update them with latest data
-      const updatedPromptsResult = await Promise.all(astriaPrompts.map(async (prompt: Prompt) => {
-        // Ensure we're getting all images from each prompt
-        if (!prompt.images || prompt.images.length === 0) {
-          console.log(`No images found for prompt ${prompt.id}`);
-          return null;
-        }
-
-        const resolvedImages = await Promise.all(
-          prompt.images.map(getFinalImageUrl)
+    while (retryCount < MAX_RETRIES) {
+      try {
+        console.log(`Fetching prompts from Astria (attempt ${retryCount + 1})...`);
+        const astriaPrompts = await getAstriaPrompts(userData.apiStatus.id.toString());
+        
+        // Log unique images from Astria prompts
+        const uniqueAstriaImages = new Set(
+          astriaPrompts.flatMap(prompt => prompt.images || [])
         );
-        
-        if (resolvedImages.some(url => !url)) {
-          console.log(`Some images failed to resolve for prompt ${prompt.id}`);
-        }
-        
-        return {
-          data: {
-            prompt: {
-              id: prompt.id,
-              text: prompt.text,
-              steps: prompt.steps,
-              images: resolvedImages.filter(Boolean), // Remove any failed URLs
-              tune_id: prompt.tune_id,
-              created_at: prompt.created_at,
-              trained_at: prompt.trained_at,
-              updated_at: prompt.updated_at,
-              negative_prompt: prompt.negative_prompt,
-              started_training_at: prompt.started_training_at
+        console.log("Total unique Astria images:", uniqueAstriaImages.size);
+
+        if (uniqueAstriaImages.size >= planLimit) {
+          // We have enough images, process them
+          const updatedPromptsResult = await Promise.all(astriaPrompts.map(async (prompt: Prompt) => {
+            if (!prompt.images || prompt.images.length === 0) {
+              console.log(`No images found for prompt ${prompt.id}`);
+              return null;
             }
-          },
-          timestamp: new Date().toISOString()
-        };
-      }));
 
-      // Filter out any null results and empty prompts
-      const filteredPrompts = updatedPromptsResult.filter((result): result is NonNullable<typeof result> => 
-        result !== null && result.data.prompt.images.length > 0
-      );
+            const resolvedImages = await Promise.all(
+              prompt.images.map(getFinalImageUrl)
+            );
+            
+            if (resolvedImages.some(url => !url)) {
+              console.log(`Some images failed to resolve for prompt ${prompt.id}`);
+            }
+            
+            return {
+              data: {
+                prompt: {
+                  id: prompt.id,
+                  text: prompt.text,
+                  steps: prompt.steps,
+                  images: resolvedImages.filter(Boolean), // Remove any failed URLs
+                  tune_id: prompt.tune_id,
+                  created_at: prompt.created_at,
+                  trained_at: prompt.trained_at,
+                  updated_at: prompt.updated_at,
+                  negative_prompt: prompt.negative_prompt,
+                  started_training_at: prompt.started_training_at
+                }
+              },
+              timestamp: new Date().toISOString()
+            };
+          }));
 
-      // Update user with the filtered prompts
-      await updateUser({
-        promptsResult: filteredPrompts
-      });
+          // Filter out any null results and empty prompts
+          const filteredPrompts = updatedPromptsResult.filter((result): result is NonNullable<typeof result> => 
+            result !== null && result.data.prompt.images.length > 0
+          );
 
-      const totalImages = filteredPrompts.reduce((total, result) => 
-        total + (result.data.prompt.images.length || 0), 0
-      );
+          // Calculate total images after filtering
+          const totalFilteredImages = filteredPrompts.reduce((total, result) => 
+            total + result.data.prompt.images.length, 0
+          );
 
-      console.log("Total images after sync:", totalImages);
-      console.log("Missing images:", planLimit - totalImages);
+          if (totalFilteredImages >= planLimit) {
+            // We have enough valid images, update the user
+            await updateUser({
+              promptsResult: filteredPrompts
+            });
+            console.log(`Successfully updated user with ${totalFilteredImages} images`);
+            return filteredPrompts;
+          }
+        }
 
-      return filteredPrompts;
-    } catch (error) {
-      console.error("Error in fixDiscrepancy:", error);
-      throw error; // Propagate the error for better error handling
+        // If we don't have enough images, retry
+        console.log(`Not enough images (${uniqueAstriaImages.size}/${planLimit}), retrying...`);
+        retryCount++;
+        if (retryCount < MAX_RETRIES) {
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        }
+      } catch (error) {
+        console.error(`Error in attempt ${retryCount + 1}:`, error);
+        retryCount++;
+        if (retryCount < MAX_RETRIES) {
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        }
+      }
     }
+
+    console.error(`Failed to get enough images after ${MAX_RETRIES} attempts`);
+    return null;
   }
-  
-  return userData.promptsResult;
+
+  return null;
 } 
