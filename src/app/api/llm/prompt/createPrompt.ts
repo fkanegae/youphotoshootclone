@@ -14,6 +14,12 @@ const headers = { Authorization: `Bearer ${API_KEY}` }
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
+// Add max attempts per prompt at the top
+const MAX_IMAGE_ATTEMPTS = 5; // Maximum retries per image batch
+
+// Add at the top of the file
+const MAX_IMAGES_PER_PROMPT = 20; // Absolute maximum per prompt
+
 async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -55,14 +61,18 @@ export async function createPrompt(userData: any) {
   const prompts = getPromptsAttributes(user);
   const results = [];
 
-  // Images per prompt based on plan type, will be multiplied by 10 prompts
-  const targetImagesPerPrompt = planType === "basic" ? 1 
-    : planType === "professional" ? 10 
-    : planType === "executive" ? 20 
-    : 1;
+  // Replace planType calculation with strict check
+  const planType = (user.planType || 'basic').toLowerCase();
+  const targetImagesPerPrompt = 
+    planType.includes('professional') ? 10 :
+    planType.includes('executive') ? 20 : 
+    1; // Default to basic
 
-  // Add validation below:
-  const validatedImagesPerPrompt = Math.max(targetImagesPerPrompt, 1);
+  // Modify validation
+  const validatedImagesPerPrompt = Math.min(
+    Math.max(targetImagesPerPrompt, 1),
+    MAX_IMAGES_PER_PROMPT
+  );
 
   // Add this validation at the start of the createPrompt function
   if (!user?.apiStatus?.id) {
@@ -72,17 +82,14 @@ export async function createPrompt(userData: any) {
   // Process prompts
   for (let promptIndex = 0; promptIndex < prompts.length; promptIndex++) {
     const prompt = prompts[promptIndex];
+    let attemptCount = 0;
+    let remainingImages = validatedImagesPerPrompt;
+    
     try {
       console.log(`Processing prompt ${promptIndex + 1}/${prompts.length}`);
       
-      const numberOfCalls = Math.ceil(validatedImagesPerPrompt / 8);
-      let remainingImages = validatedImagesPerPrompt;
-
-      // Multiple API calls for each prompt if needed
-      for (let i = 0; i < numberOfCalls; i++) {
+      while (remainingImages > 0 && attemptCount < MAX_IMAGE_ATTEMPTS) {
         const imagesThisCall = Math.min(8, remainingImages);
-        remainingImages -= imagesThisCall;
-        
         const form = new FormData();
         form.append('prompt[text]', prompt.text);
         form.append('prompt[callback]', `https://www.youphotoshoot.com/api/llm/prompt-webhook?webhook_secret=${webhookSecret}&user_id=${id}`);
@@ -95,34 +102,35 @@ export async function createPrompt(userData: any) {
         });
 
         const result = await response.json();
-        
-        // Validate received images
         const receivedImages = result?.prompt?.images?.length || 0;
-        if (receivedImages < imagesThisCall) {
-          console.warn(`Only received ${receivedImages}/${imagesThisCall} images for prompt ${promptIndex + 1}`);
-          remainingImages += (imagesThisCall - receivedImages);
+        
+        // Handle over-delivery
+        const actualReceived = Math.min(receivedImages, imagesThisCall);
+        remainingImages -= actualReceived;
+
+        // Log discrepancies
+        if (receivedImages > imagesThisCall) {
+          console.warn(`Astria over-delivered: ${receivedImages}/${imagesThisCall} images`);
+        } else if (receivedImages < imagesThisCall) {
+          console.warn(`Partial delivery: ${receivedImages}/${imagesThisCall} images`);
         }
 
         results.push(result);
-
-        // Retry if we have remaining images on last iteration
-        if (remainingImages > 0 && i === numberOfCalls - 1) {
-          console.log(`Retrying for ${remainingImages} remaining images`);
-          i--; // Re-run the loop iteration
-          continue;
-        }
-
-        // Simple 1s delay between any API calls
-        if (i < numberOfCalls - 1 || promptIndex < prompts.length - 1) {
+        attemptCount++;
+        
+        // Add delay between attempts
+        if (remainingImages > 0) {
           await sleep(DELAY);
         }
       }
+
+      if (remainingImages > 0) {
+        console.error(`Failed to get ${validatedImagesPerPrompt} images for prompt ${promptIndex + 1} after ${MAX_IMAGE_ATTEMPTS} attempts`);
+      }
+
     } catch (error) {
       console.error(`Error processing prompt ${promptIndex + 1}:`, error);
-      if (error instanceof Error) {
-        return { error: true, message: error.message };
-      }
-      return { error: true, message: 'An unknown error occurred' };
+      return { error: true, message: `Failed on prompt ${promptIndex + 1}: ${error.message}` };
     }
   }
 

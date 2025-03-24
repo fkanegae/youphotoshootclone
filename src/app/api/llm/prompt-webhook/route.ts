@@ -132,8 +132,11 @@ export async function POST(request: Request) {
     // Get the user's plan type and check prompt limit
     const userPlanType = userData.planType || 'basic';
     const allowedImages = getAllowedImages(userPlanType);
-    const currentImageCount = updatedPromptsResult.reduce((acc, prompt) => 
-      acc + (prompt.data?.prompt?.images?.length || 0), 0);
+    const currentImageCount = updatedPromptsResult.reduce((acc, prompt) => {
+      const requested = prompt.data?.prompt?.num_images || 0;
+      const received = prompt.data?.prompt?.images?.length || 0;
+      return acc + Math.min(received, requested); // Only count up to requested amount
+    }, 0);
 
     console.log("User plan type:", userPlanType);
     console.log("Allowed images:", allowedImages);
