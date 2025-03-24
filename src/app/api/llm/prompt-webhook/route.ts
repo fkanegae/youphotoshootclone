@@ -20,9 +20,6 @@ if (!appWebhookSecret) {
   throw new Error("MISSING APP_WEBHOOK_SECRET!"); // Error if webhook secret is missing
 }
 
-// Add this check at the start of the webhook handler
-const MAX_BASIC_IMAGES = 10;
-
 export async function POST(request: Request) {
 
   // Parse incoming JSON data as unknown
@@ -102,7 +99,7 @@ export async function POST(request: Request) {
   }
 
   // Update this function to return different values based on plan type
-  const getAllowedImages = (planType: string): number => {
+  const getAllowedPrompts = (planType: string): number => {
     switch (planType.toLowerCase()) {
       case 'professional':
         return 100;
@@ -134,18 +131,14 @@ export async function POST(request: Request) {
 
     // Get the user's plan type and check prompt limit
     const userPlanType = userData.planType || 'basic';
-    const allowedImages = getAllowedImages(userPlanType);
-    const currentImageCount = updatedPromptsResult.reduce((acc, prompt) => {
-      const requested = prompt.data?.prompt?.num_images || 0;
-      const received = prompt.data?.prompt?.images?.length || 0;
-      return acc + Math.min(received, requested); // Only count up to requested amount
-    }, 0);
+    const allowedPrompts = getAllowedPrompts(userPlanType);
+    const currentPromptCount = updatedPromptsResult.length;
 
     console.log("User plan type:", userPlanType);
-    console.log("Allowed images:", allowedImages);
-    console.log("Current image count:", currentImageCount);
+    console.log("Allowed prompts:", allowedPrompts);
+    console.log("Current prompt count:", currentPromptCount);
 
-    if (currentImageCount > allowedImages) {
+    if (currentPromptCount > allowedPrompts) {
       return NextResponse.json(
         {
           message: "Prompt limit exceeded for your plan.",
@@ -155,7 +148,7 @@ export async function POST(request: Request) {
     }
 
     // Check if this is the last allowed prompt
-    const isLastAllowedPrompt = currentImageCount === allowedImages;
+    const isLastAllowedPrompt = currentPromptCount === allowedPrompts;
 
     // Prepare the update object
     const updateObject: { promptsResult: any[]; workStatus?: string } = {
@@ -179,39 +172,42 @@ export async function POST(request: Request) {
     // Log success response
     console.log("Success response:", { message: "success", userId: user_id, userUpdated, isLastAllowedPrompt });
     
-    console.log('Current image breakdown:', 
-      updatedPromptsResult.map(p => ({
-        prompt: p.data.prompt?.id,
-        images: p.data.prompt?.images?.length
-      }))
-    );
-
-    // In your webhook processing logic:
-    const currentCount = updatedPromptsResult.reduce((acc, prompt) => 
-      acc + (prompt.data?.prompt?.images?.length || 0), 0);
-
-    if (currentCount >= MAX_BASIC_IMAGES) {
-      await supabase
-        .from('userTable')
-        .update({
-          apiStatus: { update: { status: 'COMPLETED' } }
-        })
-        .eq('id', user_id);
-    }
-
     return NextResponse.json(
       {
-        message: "Webhook processed successfully"
+        message: `Webhook Callback Success! User ID: ${user_id}, User Updated: ${userUpdated ? 'Yes' : 'No'}, Last Allowed Prompt: ${isLastAllowedPrompt}`,
       },
-      { status: 200 }
+      { status: 200, statusText: "Success" }
     );
-  } catch (error) {
-    console.error('Error processing webhook:', error);
+  } catch (e) {
+    console.error('Error processing webhook:', e);
     return NextResponse.json(
       {
-        message: "Internal Server Error",
+        message: "Something went wrong!",
       },
       { status: 500 }
     );
   }
 }
+
+// Example of userData field promptsResult
+// {
+//   "2024-09-29T16:16:07.635Z": {
+//     "prompt": {
+//       "id": 18609859,
+//       "text": "<lora:1661944:1.0>ohwx man in the style of communist",
+//       "steps": null,
+//       "images": [
+//         "https://sdbooth2-production.s3.amazonaws.com/sb806vy5dbscmkmy649106cum8eb",
+//         "https://sdbooth2-production.s3.amazonaws.com/982c8f6fb6m005bjidz3hiv1k8k1",
+//         "https://sdbooth2-production.s3.amazonaws.com/cga5sxuexi7ykiozybj5iltwkeg1",
+//         "https://sdbooth2-production.s3.amazonaws.com/1ukl6poc8zcnj8l0j2u5sfse7mfz"
+//       ],
+//       "tune_id": 1504944,
+//       "created_at": "2024-09-29T16:00:43.046Z",
+//       "trained_at": "2024-09-29T16:16:06.539Z",
+//       "updated_at": "2024-09-29T16:16:06.677Z",
+//       "negative_prompt": "",
+//       "started_training_at": "2024-09-29T16:13:55.014Z"
+//     }
+//   }
+// }

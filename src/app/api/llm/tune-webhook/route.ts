@@ -151,19 +151,12 @@ export async function POST(request: Request) {
     console.log("Attempting to create prompts...");
     const promptResults = await createPrompt([userData]);
 
-    if (Array.isArray(promptResults)) {
-      const errors = promptResults.filter(p => p.error);
-      if (errors.length > 0) {
-        console.error("Prompt errors:", errors);
-        return NextResponse.json(
-          { message: `Failed prompts: ${errors.length}/${promptResults.length}` },
-          { status: 500 }
-        );
-      }
-    } else {
-      console.error("Unexpected prompt results format:", promptResults);
+    if ('error' in promptResults && promptResults.error) {
+      console.error("Error creating prompts:", promptResults.message);
       return NextResponse.json(
-        { message: "Invalid prompt results format" },
+        {
+          message: "Error creating prompts",
+        },
         { status: 500 }
       );
     }

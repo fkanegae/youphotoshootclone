@@ -14,12 +14,6 @@ const headers = { Authorization: `Bearer ${API_KEY}` }
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
-// Add max attempts per prompt at the top
-const MAX_IMAGE_ATTEMPTS = 5; // Maximum retries per image batch
-
-// Add at the top of the file
-const MAX_IMAGES_PER_PROMPT = 20; // Absolute maximum per prompt
-
 async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -48,51 +42,63 @@ const DELAY = 1000; // 1 second between API calls
 /// Function to create prompts
 export async function createPrompt(userData: any) {
   const user = userData[0];
-  const { id } = user;
+  const { id, planType } = user;
 
-  // 1. Validation
-  if (!user?.apiStatus?.id) {
-    throw new Error("AI model training not completed");
-  }
+  const API_URL = `https://api.astria.ai/tunes/1504944/prompts`;
+  const webhookSecret = process.env.APP_WEBHOOK_SECRET;
 
-  // 2. Get exactly 10 prompts
   const prompts = getPromptsAttributes(user);
-  if (prompts.length !== 10) {
-    throw new Error(`Invalid prompt count: ${prompts.length}. Requires exactly 10.`);
-  }
-
-  // 3. Basic Plan Configuration
-  const isBasicPlan = (user.planType || 'basic').toLowerCase() === 'basic';
-  const imagesPerPrompt = isBasicPlan ? 1 : 10;
-
-  // 4. Process all 10 prompts
   const results = [];
-  for (let index = 0; index < prompts.length; index++) {
-    const prompt = prompts[index];
+
+  // Images per prompt based on plan type, will be multiplied by 10 prompts
+  const targetImagesPerPrompt = planType === "basic" ? 1 
+    : planType === "professional" ? 10 
+    : planType === "executive" ? 20 
+    : 1;
+
+  // Process prompts
+  for (let promptIndex = 0; promptIndex < prompts.length; promptIndex++) {
+    const prompt = prompts[promptIndex];
     try {
-      const form = new FormData();
-      form.append('prompt[text]', prompt.text);
-      form.append('prompt[callback]', `https://www.youphotoshoot.com/api/llm/prompt-webhook?webhook_secret=${process.env.APP_WEBHOOK_SECRET}&user_id=${id}`);
-      form.append('prompt[num_images]', imagesPerPrompt.toString());
-
-      const response = await fetch(`https://api.astria.ai/tunes/${user.apiStatus.id}/prompts`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${process.env.ASTRIA_API_KEY}` },
-        body: form
-      });
-
-      if (!response.ok) throw new Error(`API Error: ${response.status}`);
+      console.log(`Processing prompt ${promptIndex + 1}/${prompts.length}`);
       
-      results.push(await response.json());
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Rate limit
+      const numberOfCalls = Math.ceil(targetImagesPerPrompt / 8);
+      let remainingImages = targetImagesPerPrompt;
 
+      // Multiple API calls for each prompt if needed
+      for (let i = 0; i < numberOfCalls; i++) {
+        const imagesThisCall = Math.min(8, remainingImages);
+        remainingImages -= imagesThisCall;
+        
+        const form = new FormData();
+        form.append('prompt[text]', prompt.text);
+        form.append('prompt[callback]', `https://www.youphotoshoot.com/api/llm/prompt-webhook?webhook_secret=${webhookSecret}&user_id=${id}`);
+        form.append('prompt[num_images]', imagesThisCall.toString());
+
+        const response = await fetchWithRetry(API_URL, {
+          method: 'POST',
+          headers: headers,
+          body: form
+        });
+
+        const result = await response.json();
+        results.push(result);
+
+        // Simple 1s delay between any API calls
+        if (i < numberOfCalls - 1 || promptIndex < prompts.length - 1) {
+          await sleep(DELAY);
+        }
+      }
     } catch (error) {
-      console.error(`Prompt ${index + 1} failed:`, error);
-      // Continue processing other prompts
-      results.push({ error: true, message: `Prompt ${index + 1} failed` });
+      console.error(`Error processing prompt ${promptIndex + 1}:`, error);
+      if (error instanceof Error) {
+        return { error: true, message: error.message };
+      }
+      return { error: true, message: 'An unknown error occurred' };
     }
   }
 
+  console.log('All prompts initiated successfully:', results);
   return results;
 }
 
