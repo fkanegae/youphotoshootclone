@@ -44,7 +44,12 @@ export async function createPrompt(userData: any) {
   const user = userData[0];
   const { id, planType } = user;
 
-  const API_URL = `https://api.astria.ai/tunes/1504944/prompts`;
+  const tuneId = user.apiStatus?.id;
+  if (!tuneId) {
+    throw new Error("No tune ID found in user's API status");
+  }
+
+  const API_URL = `https://api.astria.ai/tunes/${tuneId}/prompts`;
   const webhookSecret = process.env.APP_WEBHOOK_SECRET;
 
   const prompts = getPromptsAttributes(user);
@@ -56,14 +61,22 @@ export async function createPrompt(userData: any) {
     : planType === "executive" ? 20 
     : 1;
 
+  // Add validation below:
+  const validatedImagesPerPrompt = Math.max(targetImagesPerPrompt, 1);
+
+  // Add this validation at the start of the createPrompt function
+  if (!user?.apiStatus?.id) {
+    throw new Error("User's AI model training not completed");
+  }
+
   // Process prompts
   for (let promptIndex = 0; promptIndex < prompts.length; promptIndex++) {
     const prompt = prompts[promptIndex];
     try {
       console.log(`Processing prompt ${promptIndex + 1}/${prompts.length}`);
       
-      const numberOfCalls = Math.ceil(targetImagesPerPrompt / 8);
-      let remainingImages = targetImagesPerPrompt;
+      const numberOfCalls = Math.ceil(validatedImagesPerPrompt / 8);
+      let remainingImages = validatedImagesPerPrompt;
 
       // Multiple API calls for each prompt if needed
       for (let i = 0; i < numberOfCalls; i++) {
@@ -82,7 +95,22 @@ export async function createPrompt(userData: any) {
         });
 
         const result = await response.json();
+        
+        // Validate received images
+        const receivedImages = result?.prompt?.images?.length || 0;
+        if (receivedImages < imagesThisCall) {
+          console.warn(`Only received ${receivedImages}/${imagesThisCall} images for prompt ${promptIndex + 1}`);
+          remainingImages += (imagesThisCall - receivedImages);
+        }
+
         results.push(result);
+
+        // Retry if we have remaining images on last iteration
+        if (remainingImages > 0 && i === numberOfCalls - 1) {
+          console.log(`Retrying for ${remainingImages} remaining images`);
+          i--; // Re-run the loop iteration
+          continue;
+        }
 
         // Simple 1s delay between any API calls
         if (i < numberOfCalls - 1 || promptIndex < prompts.length - 1) {
