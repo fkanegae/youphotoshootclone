@@ -48,7 +48,7 @@ const DELAY = 1000; // 1 second between API calls
 /// Function to create prompts
 export async function createPrompt(userData: any) {
   const user = userData[0];
-  const { id, planType } = user;
+  const { id } = user;
 
   const tuneId = user.apiStatus?.id;
   if (!tuneId) {
@@ -61,14 +61,13 @@ export async function createPrompt(userData: any) {
   const prompts = getPromptsAttributes(user);
   const results = [];
 
-  // Replace planType calculation with strict check
-  const planType = (user.planType || 'basic').toLowerCase();
+  // Modify validation
+  const planType = ((user.planType as string) || 'basic').toLowerCase();
   const targetImagesPerPrompt = 
     planType.includes('professional') ? 10 :
     planType.includes('executive') ? 20 : 
     1; // Default to basic
 
-  // Modify validation
   const validatedImagesPerPrompt = Math.min(
     Math.max(targetImagesPerPrompt, 1),
     MAX_IMAGES_PER_PROMPT
@@ -128,9 +127,13 @@ export async function createPrompt(userData: any) {
         console.error(`Failed to get ${validatedImagesPerPrompt} images for prompt ${promptIndex + 1} after ${MAX_IMAGE_ATTEMPTS} attempts`);
       }
 
-    } catch (error) {
+    } catch (err) {
+      const error = err as Error;
       console.error(`Error processing prompt ${promptIndex + 1}:`, error);
-      return { error: true, message: `Failed on prompt ${promptIndex + 1}: ${error.message}` };
+      return { 
+        error: true, 
+        message: `Failed on prompt ${promptIndex + 1}: ${error.message}` 
+      };
     }
   }
 
