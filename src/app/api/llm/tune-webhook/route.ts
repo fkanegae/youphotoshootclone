@@ -160,10 +160,10 @@ export async function POST(request: Request) {
           { status: 500 }
         );
       }
-    } else if (promptResults?.error) {
-      console.error("Prompt creation error:", promptResults.message || 'Unknown error');
+    } else {
+      console.error("Unexpected prompt results format:", promptResults);
       return NextResponse.json(
-        { message: "Prompt creation failed" },
+        { message: "Invalid prompt results format" },
         { status: 500 }
       );
     }
