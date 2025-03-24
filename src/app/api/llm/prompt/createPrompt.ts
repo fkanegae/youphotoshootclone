@@ -50,94 +50,49 @@ export async function createPrompt(userData: any) {
   const user = userData[0];
   const { id } = user;
 
-  const tuneId = user.apiStatus?.id;
-  if (!tuneId) {
-    throw new Error("No tune ID found in user's API status");
-  }
-
-  const API_URL = `https://api.astria.ai/tunes/${tuneId}/prompts`;
-  const webhookSecret = process.env.APP_WEBHOOK_SECRET;
-
-  const prompts = getPromptsAttributes(user);
-  const results = [];
-
-  // Modify validation
-  const planType = ((user.planType as string) || 'basic').toLowerCase();
-  const targetImagesPerPrompt = 
-    planType.includes('professional') ? 10 :
-    planType.includes('executive') ? 20 : 
-    1; // Default to basic
-
-  const validatedImagesPerPrompt = Math.min(
-    Math.max(targetImagesPerPrompt, 1),
-    MAX_IMAGES_PER_PROMPT
-  );
-
-  // Add this validation at the start of the createPrompt function
+  // 1. Validation
   if (!user?.apiStatus?.id) {
-    throw new Error("User's AI model training not completed");
+    throw new Error("AI model training not completed");
   }
 
-  // Process prompts
-  for (let promptIndex = 0; promptIndex < prompts.length; promptIndex++) {
-    const prompt = prompts[promptIndex];
-    let attemptCount = 0;
-    let remainingImages = validatedImagesPerPrompt;
-    
+  // 2. Get exactly 10 prompts
+  const prompts = getPromptsAttributes(user);
+  if (prompts.length !== 10) {
+    throw new Error(`Invalid prompt count: ${prompts.length}. Requires exactly 10.`);
+  }
+
+  // 3. Basic Plan Configuration
+  const isBasicPlan = (user.planType || 'basic').toLowerCase() === 'basic';
+  const imagesPerPrompt = isBasicPlan ? 1 : 10;
+
+  // 4. Process all 10 prompts
+  const results = [];
+  for (let index = 0; index < prompts.length; index++) {
+    const prompt = prompts[index];
     try {
-      console.log(`Processing prompt ${promptIndex + 1}/${prompts.length}`);
+      const form = new FormData();
+      form.append('prompt[text]', prompt.text);
+      form.append('prompt[callback]', `https://www.youphotoshoot.com/api/llm/prompt-webhook?webhook_secret=${process.env.APP_WEBHOOK_SECRET}&user_id=${id}`);
+      form.append('prompt[num_images]', imagesPerPrompt.toString());
+
+      const response = await fetch(`https://api.astria.ai/tunes/${user.apiStatus.id}/prompts`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${process.env.ASTRIA_API_KEY}` },
+        body: form
+      });
+
+      if (!response.ok) throw new Error(`API Error: ${response.status}`);
       
-      while (remainingImages > 0 && attemptCount < MAX_IMAGE_ATTEMPTS) {
-        const imagesThisCall = Math.min(8, remainingImages);
-        const form = new FormData();
-        form.append('prompt[text]', prompt.text);
-        form.append('prompt[callback]', `https://www.youphotoshoot.com/api/llm/prompt-webhook?webhook_secret=${webhookSecret}&user_id=${id}`);
-        form.append('prompt[num_images]', imagesThisCall.toString());
+      results.push(await response.json());
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Rate limit
 
-        const response = await fetchWithRetry(API_URL, {
-          method: 'POST',
-          headers: headers,
-          body: form
-        });
-
-        const result = await response.json();
-        const receivedImages = result?.prompt?.images?.length || 0;
-        
-        // Handle over-delivery
-        const actualReceived = Math.min(receivedImages, imagesThisCall);
-        remainingImages -= actualReceived;
-
-        // Log discrepancies
-        if (receivedImages > imagesThisCall) {
-          console.warn(`Astria over-delivered: ${receivedImages}/${imagesThisCall} images`);
-        } else if (receivedImages < imagesThisCall) {
-          console.warn(`Partial delivery: ${receivedImages}/${imagesThisCall} images`);
-        }
-
-        results.push(result);
-        attemptCount++;
-        
-        // Add delay between attempts
-        if (remainingImages > 0) {
-          await sleep(DELAY);
-        }
-      }
-
-      if (remainingImages > 0) {
-        console.error(`Failed to get ${validatedImagesPerPrompt} images for prompt ${promptIndex + 1} after ${MAX_IMAGE_ATTEMPTS} attempts`);
-      }
-
-    } catch (err) {
-      const error = err as Error;
-      console.error(`Error processing prompt ${promptIndex + 1}:`, error);
-      return { 
-        error: true, 
-        message: `Failed on prompt ${promptIndex + 1}: ${error.message}` 
-      };
+    } catch (error) {
+      console.error(`Prompt ${index + 1} failed:`, error);
+      // Continue processing other prompts
+      results.push({ error: true, message: `Prompt ${index + 1} failed` });
     }
   }
 
-  console.log('All prompts initiated successfully:', results);
   return results;
 }
 

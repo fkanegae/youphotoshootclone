@@ -20,6 +20,9 @@ if (!appWebhookSecret) {
   throw new Error("MISSING APP_WEBHOOK_SECRET!"); // Error if webhook secret is missing
 }
 
+// Add this check at the start of the webhook handler
+const MAX_BASIC_IMAGES = 10;
+
 export async function POST(request: Request) {
 
   // Parse incoming JSON data as unknown
@@ -182,6 +185,19 @@ export async function POST(request: Request) {
         images: p.data.prompt?.images?.length
       }))
     );
+
+    // In your webhook processing logic:
+    const currentCount = updatedPromptsResult.reduce((acc, prompt) => 
+      acc + (prompt.data?.prompt?.images?.length || 0), 0);
+
+    if (currentCount >= MAX_BASIC_IMAGES) {
+      await supabase
+        .from('userTable')
+        .update({
+          apiStatus: { update: { status: 'COMPLETED' } }
+        })
+        .eq('id', user_id);
+    }
 
     return NextResponse.json(
       {
