@@ -11,6 +11,9 @@ interface UserFormData {
     userSelfies?: string[];
   };
   promptsResult?: any[];
+  validImageUrls?: string[];
+  workStatus?: string;
+  hasBeenReviewed?: boolean;
 }
 
 export async function updateUser(formData: UserFormData) {
@@ -41,6 +44,11 @@ export async function updateUser(formData: UserFormData) {
     };
   }
 
+  // For validImageUrls field on basic plan, load current values if we need to merge
+  if (formData.validImageUrls) {
+    console.log(`Updating validImageUrls with ${formData.validImageUrls.length} URLs`);
+  }
+
   // Update the user data in the 'userTable'
   const { data, error } = await supabase
     .from('userTable')
@@ -52,8 +60,19 @@ export async function updateUser(formData: UserFormData) {
     return { error: "Failed to update user data" };
   }
 
-  // Only redirect if it's not an image upload or promptsResult update
-  if (!formData.userPhotos && !formData.promptsResult) {
+  console.log("User data updated successfully:", {
+    userId,
+    hasValidImageUrls: !!formData.validImageUrls,
+    validImageUrlsCount: formData.validImageUrls?.length,
+    hasPromptsResult: !!formData.promptsResult,
+    promptsResultCount: formData.promptsResult?.length,
+    workStatus: formData.workStatus,
+  });
+
+  // Only redirect if it's not an image upload, promptsResult update, or validImageUrls update
+  if (!formData.userPhotos && !formData.promptsResult && !formData.validImageUrls) {
     redirect('/upload/styles');
   }
+  
+  return { success: true };
 }

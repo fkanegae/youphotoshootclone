@@ -12,16 +12,26 @@ export default async function DashboardPage() {
   }
 
   const downloadHistory = userData?.[0]?.downloadHistory || [];
-
+  const userPlanType = userData?.[0]?.planType?.toLowerCase() || 'basic';
+  
   let imageUrls: string[] = [];
   const promptsResult = userData?.[0]?.promptsResult || [];
 
-  // Extract image URLs from promptsResult
-  if (promptsResult.length > 0) {
-    imageUrls = promptsResult.flatMap(
-      (result: { data?: { prompt?: { images: string[] } } }) =>
-        result.data?.prompt?.images || []
-    );
+  // For basic plan users, prioritize the validImageUrls field which guarantees 10 images
+  if (userPlanType === 'basic' && Array.isArray(userData?.[0]?.validImageUrls) && userData?.[0]?.validImageUrls.length > 0) {
+    console.log("Using validImageUrls for basic plan user with", userData?.[0]?.validImageUrls.length, "images");
+    imageUrls = userData?.[0]?.validImageUrls;
+  } else {
+    // Extract image URLs from promptsResult for other plans
+    if (promptsResult.length > 0) {
+      imageUrls = promptsResult.flatMap(
+        (result: { data?: { prompt?: { images: string[] } } }) =>
+          result.data?.prompt?.images || []
+      );
+    }
+    
+    // Log information about extracted images
+    console.log("Extracted", imageUrls.length, "images from promptsResult for", userPlanType, "plan");
   }
 
   return (
