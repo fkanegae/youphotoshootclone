@@ -26,7 +26,7 @@ type StyleObject = BackgroundStyle | ClothingStyle;
 
 /**
  * Page component for style selection in the headshot upload process.
- * Allows users to select up to 6 styles for their headshots.
+ * Allows users to select all 10 styles for their headshots.
  */
 export default function Page() {
   // State for storing user data
@@ -82,7 +82,7 @@ export default function Page() {
     backgroundStyle: StyleObject,
     clothingStyle: StyleObject
   ) => {
-    if (selectedStyles.length < 6) {
+    if (selectedStyles.length < 10) {
       const newSelectedStyles = [
         ...selectedStyles,
         {
@@ -113,7 +113,7 @@ export default function Page() {
    * Randomly selects styles to fill up the remaining slots in the Selected styles list.
    */
   const handleChooseForMe = () => {
-    const remainingSlots = 6 - selectedStyles.length;
+    const remainingSlots = 10 - selectedStyles.length;
     const newStyles: StyleObject[] = [];
 
     for (let i = 0; i < remainingSlots; i++) {
@@ -136,59 +136,14 @@ export default function Page() {
     setSelectedStyles([...selectedStyles, ...newStyles]);
   };
 
-  // Get gender-specific preselected styles
-  const getPreselectedStyles = () => {
-    if (!userData?.gender) return [];
-
-    const commonStyles = [
-      {
-        backgroundTitle: "Garden",
-        backgroundPrompt: "Lush garden with colorful flowers and green foliage",
-        clothingTitle: userData.gender === "woman" ? "White blouse with bow" : "White button-up shirt",
-        clothingPrompt: userData.gender === "woman" 
-          ? "Elegant white blouse with feminine bow detail"
-          : "Clean, classic white button-up shirt",
-      },
-      {
-        backgroundTitle: "Office",
-        backgroundPrompt: "Modern office setting with a desk and computer",
-        clothingTitle: userData.gender === "woman" ? "Navy structured dress" : "Dark blue tailored suit",
-        clothingPrompt: userData.gender === "woman"
-          ? "Professional navy structured dress with subtle details"
-          : "Executive wearing an elegant dark blue tailored suit",
-      },
-      {
-        backgroundTitle: "Grey",
-        backgroundPrompt: "Neutral grey background",
-        clothingTitle: userData.gender === "woman" ? "Black fitted blazer" : "Light gray suit ensemble",
-        clothingPrompt: userData.gender === "woman"
-          ? "Professional black fitted blazer with feminine cut"
-          : "Light gray suit ensemble with matching tie",
-      },
-      {
-        backgroundTitle: "Outdoors",
-        backgroundPrompt: "Outdoor scene with trees and a path",
-        clothingTitle: userData.gender === "woman" ? "Cream silk blouse" : "Black v-neck sweater",
-        clothingPrompt: userData.gender === "woman"
-          ? "Luxurious cream silk blouse with subtle draping"
-          : "Casual black v-neck sweater with subtle texture",
-      },
-    ];
-
-    return commonStyles;
-  };
-
-  // Update preselectedStyles to use gender-specific styles
-  const preselectedStyles = getPreselectedStyles();
-
-  // Update handleContinue to use the new structure
+  // Update handleContinue to use the new structure with empty preselected styles
   const handleContinue = async () => {
-    if (selectedStyles.length === 6 && !isProcessing) {
+    if (selectedStyles.length === 10 && !isProcessing) {
       setIsProcessing(true);
       try {
         await updateStyles({
           userSelected: selectedStyles,
-          preSelected: preselectedStyles,
+          preSelected: [] // No more preselected styles
         });
         // The redirect is handled in the server action
       } catch (error) {
@@ -223,7 +178,7 @@ export default function Page() {
 
       <div className="container mx-auto max-w-6xl">
         <h1 className="text-3xl font-bold text-mainBlack mb-4 text-center">
-          Select 6 styles for your headshots
+          Select 10 styles for your headshots
         </h1>
         <p className="text-lg text-mainBlack mb-8 text-center">
           Choose which background and clothing styles you want to wear for your
@@ -238,57 +193,54 @@ export default function Page() {
               </h2>
               <button
                 className={`font-medium px-4 py-2 rounded transition-colors ${
-                  selectedStyles.length === 6
+                  selectedStyles.length === 10
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-gray-200 text-mainBlack hover:bg-gray-300"
                 }`}
                 onClick={handleChooseForMe}
-                disabled={selectedStyles.length === 6}
+                disabled={selectedStyles.length === 10}
               >
-                {selectedStyles.length === 6 ? (
+                {selectedStyles.length === 10 ? (
                   "Selection complete ✓"
                 ) : (
-                  <>Choose for me {selectedStyles.length}/6</>
+                  <>Choose for me {selectedStyles.length}/10</>
                 )}
               </button>
             </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {styleData.backgroundStyles
-                .sort((a, b) => {
-                  const popularStyles = ["Streets", "Office", "White"];
-                  const aIsPopular = popularStyles.includes(a.backgroundTitle);
-                  const bIsPopular = popularStyles.includes(b.backgroundTitle);
-                  if (aIsPopular && !bIsPopular) return -1;
-                  if (!aIsPopular && bIsPopular) return 1;
-                  return 0;
+                .filter((style) => {
+                  // Check if the style is valid for the user's gender
+                  return (
+                    !userData?.gender ||
+                    (userData.gender === "woman" && style.womenImage) ||
+                    (userData.gender === "man" && style.menImage)
+                  );
                 })
                 .map((style, index) => {
                 const isSelected = isStyleSelected(style);
-                const imagePath = userData?.gender === "woman" ? style.womenImage : style.menImage;
-                
                 return (
                   <div
                     key={index}
-                    className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer transition-transform duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg ${
-                      isSelected ? "opacity-50" : ""
+                    className={`aspect-square relative rounded-lg overflow-hidden cursor-pointer border-2 ${
+                      isSelected
+                        ? "border-mainGreen shadow-md"
+                        : "border-transparent"
                     }`}
                     onClick={() => handleCardClick(style)}
                   >
+                    {/* Display different images based on gender */}
                     <Image
-                      src={imagePath}
+                      src={
+                        userData?.gender === "woman"
+                          ? style.womenImage
+                          : style.menImage
+                      }
                       alt={style.backgroundTitle}
                       fill
-                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                       className="object-cover"
                     />
-                    {(style.backgroundTitle === "Streets" || 
-                      style.backgroundTitle === "Office" || 
-                      style.backgroundTitle === "White") && (
-                      <div className="absolute top-2 right-2 bg-mainOrange text-white text-xs font-semibold px-2.5 py-0.5 rounded-full shadow-sm">
-                        Popular
-                      </div>
-                    )}
                     <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
                       <h3 className="text-white font-medium">{style.backgroundTitle}</h3>
                     </div>
@@ -319,7 +271,7 @@ export default function Page() {
             </h2>
             <div className="bg-gray-100 rounded-lg shadow-md p-4 mb-4">
               <p className="text-mainBlack mb-2 font-medium">
-                Selected styles {selectedStyles.length}/6
+                Selected styles {selectedStyles.length}/10
               </p>
               {selectedStyles.map((style, index) => (
                 <div
@@ -356,7 +308,8 @@ export default function Page() {
                   </button>
                 </div>
               ))}
-              {[...Array(6 - selectedStyles.length)].map((_, index) => (
+
+              {[...Array(10 - selectedStyles.length)].map((_, index) => (
                 <div
                   key={index}
                   className="bg-gray-200 rounded-lg p-3 mb-2 text-gray-500 italic"
@@ -366,44 +319,21 @@ export default function Page() {
               ))}
             </div>
 
-            <div className="bg-gray-100 rounded-lg shadow-md p-4">
-              <h3 className="text-lg font-semibold text-mainBlack mb-2">
-                Preselected styles
-              </h3>
-              <div className="grid grid-cols-1 gap-2">
-                {preselectedStyles.map((style, index) => (
-                  <div
-                    key={index}
-                    className="bg-white rounded-lg p-3 text-mainBlack relative shadow-sm"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-sm">
-                        {style.backgroundTitle}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {style.clothingTitle}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             <button
               className={`w-full mt-4 font-medium px-4 py-2 rounded transition-colors ${
-                selectedStyles.length === 6 && !isProcessing
+                selectedStyles.length === 10 && !isProcessing
                   ? "bg-mainOrange text-mainBlack hover:bg-opacity-90"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
-              disabled={selectedStyles.length < 6 || isProcessing}
+              disabled={selectedStyles.length < 10 || isProcessing}
               onClick={handleContinue}
             >
               {isProcessing
                 ? "Processing..."
-                : selectedStyles.length === 6
+                : selectedStyles.length === 10
                 ? "Continue to next step →"
-                : `Select ${6 - selectedStyles.length} more style${
-                    selectedStyles.length === 5 ? "" : "s"
+                : `Select ${10 - selectedStyles.length} more style${
+                    selectedStyles.length === 9 ? "" : "s"
                   }`}
             </button>
           </div>

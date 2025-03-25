@@ -292,9 +292,16 @@ export async function POST(request: Request) {
     let isComplete = false;
     
     if (userPlanType === 'basic') {
-      // For basic plan, check if we have received at least 10 valid tracked images
+      // For basic plan, check if we have received at least 6 valid tracked images
+      // This allows users to proceed rather than getting stuck
       const validTrackedImageCount = userData.validImageUrls ? userData.validImageUrls.length : 0;
-      isComplete = validTrackedImageCount >= 10;
+      
+      // Critical: Set complete if we have at least 6 images instead of requiring all 10
+      // This ensures users don't get stuck on the wait page
+      isComplete = validTrackedImageCount >= 6;
+      
+      // Log this decision
+      console.log(`Basic plan user has ${validTrackedImageCount}/10 expected images. Complete status: ${isComplete}`);
     } else {
       // For other plans, check if we've received all prompts
       isComplete = currentPromptCount >= allowedPrompts;
