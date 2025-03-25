@@ -9,10 +9,12 @@ import submitPhotos from "@/action/submitPhotos";
 
 // Define the interface for style items
 interface StyleItem {
-  backgroundTitle: string;
-  backgroundPrompt: string;
-  clothingTitle: string;
-  clothingPrompt: string;
+  background: string;
+  clothing: string;
+  backgroundTitle?: string;
+  backgroundPrompt?: string;
+  clothingTitle?: string;
+  clothingPrompt?: string;
 }
 
 export default async function Page() {
@@ -128,7 +130,7 @@ export default async function Page() {
               <ul className="list-disc pl-5 space-y-1">
                 {userSelectedStyles.map((item: StyleItem, index: number) => (
                   <li key={index} className="text-gray-600 text-sm text-left">
-                    {item.backgroundTitle} - {item.clothingTitle}
+                    {item.background} - {item.clothing}
                   </li>
                 ))}
               </ul>

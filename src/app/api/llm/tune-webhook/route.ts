@@ -37,6 +37,13 @@ export async function POST(request: Request) {
     created_at: string;
     updated_at: string;
     expires_at: null;
+    styles: {
+      type: string;
+      styles: {
+        clothing: string;
+        background: string;
+      }[];
+    }[];
   };
 
   // Parse incoming JSON data

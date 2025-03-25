@@ -16,14 +16,16 @@ export const getPromptsAttributes = (user: any) => {
 
   return userStyles.map((style: any) => {
     // Count occurrences of each clothing title
-    const count = clothingCounts.get(style.clothingTitle) || 0;
-    clothingCounts.set(style.clothingTitle, count + 1);
+    const count = clothingCounts.get(style.clothing) || 0;
+    clothingCounts.set(style.clothing, count + 1);
 
     // Add variation number if this clothing has been used before
     const variationText = count > 0 ? ` (variation ${count + 1})` : '';
 
+    // Create the prompt using the background name (no prompt details available)
+    // This is a workaround due to the database only storing 'background' and 'clothing'
     return {
-      text: `<lora:${tuneId}:1.0> A professional headshot of ohwx ${gender.toLowerCase()}, age ${age}. Wearing ${style.clothingTitle}${variationText} in ${style.backgroundPrompt}.`
+      text: `<lora:${tuneId}:1.0> A professional headshot of ohwx ${gender.toLowerCase()}, age ${age}. Wearing ${style.clothing}${variationText} in ${style.background} setting.`
     };
   });
 };

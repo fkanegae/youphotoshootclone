@@ -86,6 +86,9 @@ export default function Page() {
       const newSelectedStyles = [
         ...selectedStyles,
         {
+          background: backgroundStyle.backgroundTitle,
+          clothing: clothingStyle.clothingTitle,
+          // Store these too for reference, but they're not used in the database schema
           backgroundTitle: backgroundStyle.backgroundTitle,
           backgroundPrompt: backgroundStyle.backgroundPrompt,
           clothingTitle: clothingStyle.clothingTitle,
@@ -126,6 +129,9 @@ export default function Page() {
           Math.floor(Math.random() * filteredClothingStyles.length)
         ];
       newStyles.push({
+        background: randomBackgroundStyle.backgroundTitle,
+        clothing: randomClothingStyle.clothingTitle,
+        // Store these too for reference, but they're not used in the database schema
         backgroundTitle: randomBackgroundStyle.backgroundTitle,
         backgroundPrompt: randomBackgroundStyle.backgroundPrompt,
         clothingTitle: randomClothingStyle.clothingTitle,
