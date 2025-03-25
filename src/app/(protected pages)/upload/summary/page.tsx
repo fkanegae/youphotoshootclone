@@ -1,20 +1,53 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import getUser from "@/action/getUser";
 import Image from "next/image";
-import Link from "next/link";
+import getUser from "@/action/getUser";
 import { Suspense } from "react";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 import SubmitButton from "./SubmitButton";
-import submitPhotos from "@/action/submitPhotos";
 
-// Define the interface for style items
-interface StyleItem {
-  background: string;
-  clothing: string;
+// Add this type definition
+type StyleItem = {
   backgroundTitle?: string;
   backgroundPrompt?: string;
   clothingTitle?: string;
   clothingPrompt?: string;
+};
+
+async function submitPhotos() {
+  "use server";
+
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error("No authenticated user found");
+    return { error: "User not authenticated" };
+  }
+
+  const { data, error } = await supabase
+    .from("userTable")
+    .update({
+      submissionDate: new Date().toISOString(),
+      workStatus: "ongoing",
+    })
+    .eq("id", userId);
+
+  if (error) {
+    console.error("Error updating user data in Supabase:", error);
+    return { error: "Failed to update user data" };
+  }
+
+  // Log success message
+  console.log(
+    "Successfully updated submissionDate and workStatus in Supabase for user:",
+    userId
+  );
+
+  redirect("/wait"); // Redirect to a thank you page
 }
 
 export default async function Page() {
@@ -25,9 +58,10 @@ export default async function Page() {
     return <div>Error: User data not found</div>;
   }
 
-  // Only get userSelected styles now - all 10 styles are user selected
   const userSelectedStyles =
     user.styles.find((s: any) => s.type === "userSelected")?.styles || [];
+  const preSelectedStyles =
+    user.styles.find((s: any) => s.type === "preSelected")?.styles || [];
 
   return (
     <div className="bg-mainWhite min-h-screen p-4 pt-8 md:pt-16 text-center">
@@ -49,91 +83,97 @@ export default async function Page() {
         <p className="text-[11px] text-mainBlack mt-2">Step 5 of 5</p>
       </div>
 
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-mainBlack mb-2">
-          Order Summary
-        </h1>
-        <p className="text-mainBlack mb-8">
-          Review your order details and upload your selfies.
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-bold text-mainBlack mb-2">All done!</h1>
+        <p className="text-lg text-mainBlack mb-8">
+          No changes can be made once we pass this page over to our AI
+          photographer.
         </p>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 mb-8">
-          <h2 className="text-2xl font-semibold text-mainBlack mb-4 text-left">
-            Order details
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gray-50 rounded-lg p-4 text-left">
-              <p className="text-mainBlack text-sm font-medium mb-2">
-                Account Details
-              </p>
-              <p className="text-gray-600 text-sm">
-                <span className="font-semibold">Name:</span> {user.name}
-              </p>
-              <p className="text-gray-600 text-sm">
-                <span className="font-semibold">Email:</span> {user.email}
-              </p>
-              <p className="text-gray-600 text-sm">
-                <span className="font-semibold">Plan:</span>{" "}
-                {user.planType || "Basic"}
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg p-4 text-left">
-              <p className="text-mainBlack text-sm font-medium mb-2">
-                Personal Details
-              </p>
-              <p className="text-gray-600 text-sm">
-                <span className="font-semibold">Gender:</span> {user.gender}
-              </p>
-              <p className="text-gray-600 text-sm">
-                <span className="font-semibold">Age:</span> {user.age}
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg p-4 text-left">
-              <p className="text-mainBlack text-sm font-medium mb-2">
-                Payment Details
-              </p>
-              <p className="text-gray-600 text-sm">
-                <span className="font-semibold">Status:</span>{" "}
-                {user.paymentStatus || "Pending"}
-              </p>
-              <p className="text-gray-600 text-sm">
-                <span className="font-semibold">Amount:</span>{" "}
-                {user.amount ? `$${(user.amount / 100).toFixed(2)}` : "N/A"}
-              </p>
-              <p className="text-gray-600 text-sm">
-                <span className="font-semibold">Date:</span>{" "}
-                {user.paid_at
-                  ? new Date(user.paid_at).toLocaleDateString()
-                  : "N/A"}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-md p-6 mb-8">
-          <h2 className="text-2xl font-semibold text-mainBlack mb-4 text-left">
-            Selected styles
-          </h2>
-
-          <p className="text-mainBlack mb-4 text-sm text-left">
-            You&apos;ve selected the following style combinations for your headshots:
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <p className="text-mainBlack text-sm font-medium mb-2 text-left">
-                Your 10 selected styles
-              </p>
-              <ul className="list-disc pl-5 space-y-1">
-                {userSelectedStyles.map((item: StyleItem, index: number) => (
-                  <li key={index} className="text-gray-600 text-sm text-left">
-                    {item.background} - {item.clothing}
-                  </li>
+              <h2 className="text-xl font-semibold text-mainBlack mb-4 text-left">
+                Your info
+              </h2>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                {[
+                  { label: "Name", value: user.name },
+                  { label: "Age", value: user.age },
+                  { label: "Gender", value: user.gender },
+                ].map((item, index) => (
+                  <div
+                    key={index}
+                    className="border-b border-gray-200 pb-2 text-left"
+                  >
+                    <p className="text-mainBlack text-xs font-medium mb-1">
+                      {item.label}
+                    </p>
+                    <p className="text-mainBlack text-sm">
+                      {item.value}
+                    </p>
+                  </div>
                 ))}
-              </ul>
+              </div>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-mainBlack mb-4 text-left">
+                Your styles
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-mainBlack text-sm font-medium mb-2 text-left">
+                    Your selection
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {userSelectedStyles.map(
+                      (item: StyleItem, index: number) => (
+                        <li
+                          key={index}
+                          className="text-gray-600 text-sm text-left"
+                        >
+                          {item.backgroundTitle && item.clothingTitle ? (
+                            <>
+                              {item.backgroundTitle} - {item.clothingTitle}
+                            </>
+                          ) : item.backgroundTitle ? (
+                            item.backgroundTitle
+                          ) : item.clothingTitle ? (
+                            item.clothingTitle
+                          ) : (
+                            'N/A'
+                          )}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-mainBlack text-sm font-medium mb-2 text-left">
+                    Pre-selected by us
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {preSelectedStyles.map((item: StyleItem, index: number) => (
+                      <li
+                        key={index}
+                        className="text-gray-600 text-sm text-left"
+                      >
+                        {item.backgroundTitle && item.clothingTitle ? (
+                          <>
+                            {item.backgroundTitle} - {item.clothingTitle}
+                          </>
+                        ) : item.backgroundTitle ? (
+                          item.backgroundTitle
+                        ) : item.clothingTitle ? (
+                          item.clothingTitle
+                        ) : (
+                          'N/A'
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>

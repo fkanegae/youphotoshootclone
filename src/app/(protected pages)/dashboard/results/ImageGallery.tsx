@@ -13,7 +13,6 @@ interface ImageGalleryProps {
     name: string;
     planType: "Basic" | "Professional" | "Executive";
     promptsResult: any[]; // Array of generated images
-    validImageUrls?: string[]; // Added field for tracked valid image URLs
     apiStatus: {
       id: number;
       // ... other fields
@@ -33,11 +32,6 @@ export default function ImageGallery({
     userData?.promptsResult || []
   );
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Track validImageUrls from userData
-  const [validImageUrls, setValidImageUrls] = useState<string[]>(
-    userData?.validImageUrls || []
-  );
 
   const handleDownload = async (index: number) => {
     const imageUrl = displayImages[index];
@@ -83,21 +77,11 @@ export default function ImageGallery({
   };
 
   const planLimit = userData ? getPlanLimit(userData.planType) : 0;
-  const isBasicPlan = userData?.planType.toLowerCase() === 'basic';
-  
-  // For basic plan, we'll use either validImageUrls or a calculated count
-  const hasValidImageUrls = validImageUrls.length > 0;
-  
+  const currentCount = userData?.promptsResult?.length || 0;
+  const remainingSlots = Math.max(0, planLimit - currentCount);
+
   useEffect(() => {
     async function checkDiscrepancy() {
-      // If basic plan user already has validImageUrls (our new tracking field),
-      // we can use that directly and skip the discrepancy check
-      if (isBasicPlan && hasValidImageUrls && validImageUrls.length >= 10) {
-        console.log("Using existing validImageUrls:", validImageUrls.length);
-        setIsLoading(false);
-        return;
-      }
-      
       const totalImagesFromPrompts = promptsResult.reduce(
         (total, result) => total + (result.data?.prompt?.images?.length || 0),
         0
@@ -109,7 +93,6 @@ export default function ImageGallery({
 
       console.log("Images received:", {
         imagesFromProps: images.length,
-        validImageUrls: validImageUrls.length,
         promptResults: promptsResult.length,
         imageCountsPerPrompt,
         totalImagesFromPrompts,
@@ -119,15 +102,12 @@ export default function ImageGallery({
       });
 
       // Check discrepancy based on total images, not prompt count
-      // For basic plan, check validImageUrls first
-      const hasDiscrepancy = isBasicPlan
-        ? validImageUrls.length < 10 && totalImagesFromPrompts < planLimit && userData !== null
-        : totalImagesFromPrompts < planLimit && userData !== null;
+      const hasDiscrepancy =
+        totalImagesFromPrompts < planLimit && userData !== null;
 
       console.log({
         isDiscrepancyCheck: true,
         totalImages: totalImagesFromPrompts,
-        validUrls: validImageUrls.length,
         planLimit,
         shouldFix: hasDiscrepancy,
         userData: !!userData,
@@ -139,41 +119,25 @@ export default function ImageGallery({
         console.log("Discrepancy fix result:", !!updatedPrompts);
         if (updatedPrompts) {
           setPromptsResult(updatedPrompts);
-          
-          // For basic plan, try to extract validImageUrls from the server response
-          if (isBasicPlan && userData?.validImageUrls && userData.validImageUrls.length > 0) {
-            setValidImageUrls(userData.validImageUrls);
-          }
         }
       } else {
         console.log("No fix needed:", {
           reason: !userData
             ? "No user data"
-            : isBasicPlan && hasValidImageUrls
-            ? `Already have ${validImageUrls.length} valid tracked images`
             : "Image count meets or exceeds plan limit",
-          validImageUrls: validImageUrls.length,
           totalImages: totalImagesFromPrompts,
           planLimit,
         });
-        
-        // Only set loading to false if we have enough images
-        if ((isBasicPlan && hasValidImageUrls && validImageUrls.length >= 10) || 
-            totalImagesFromPrompts >= planLimit) {
+        // Only set loading to false if we have all images
+        if (totalImagesFromPrompts >= planLimit) {
           setIsLoading(false);
         }
       }
     }
     checkDiscrepancy();
-  }, [images.length, planLimit, promptsResult, userData, validImageUrls, isBasicPlan, hasValidImageUrls]);
+  }, [images.length, planLimit, promptsResult, userData]);
 
   const displayImages = useMemo(() => {
-    // For basic plan, prioritize the validImageUrls if available
-    if (isBasicPlan && hasValidImageUrls) {
-      return validImageUrls;
-    }
-    
-    // For other plans or as fallback, use the promptsResult
     if (promptsResult.length > 0) {
       const sortedPrompts = [...promptsResult].sort((a, b) => {
         const dateA = new Date(
@@ -187,18 +151,13 @@ export default function ImageGallery({
 
       return sortedPrompts.flatMap((result) => result.data.prompt.images);
     }
-    
-    // Fallback to the images prop
     return images;
-  }, [promptsResult, images, validImageUrls, isBasicPlan, hasValidImageUrls]);
+  }, [promptsResult, images]);
 
-  // Calculate how many skeleton loaders to show
+  // Update to only show skeletons for the difference
   const uniqueImageCount = new Set(displayImages).size;
-  const hasDiscrepancy = isLoading && (
-    (isBasicPlan && uniqueImageCount < 10) || 
-    (!isBasicPlan && uniqueImageCount < planLimit)
-  );
-  const skeletonCount = isBasicPlan ? 10 - uniqueImageCount : planLimit - uniqueImageCount;
+  const hasDiscrepancy = isLoading && uniqueImageCount < planLimit;
+  const skeletonCount = planLimit - uniqueImageCount;
 
   return (
     <>

@@ -3,15 +3,10 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from 'next/navigation';
 
-// Define the StyleObject interface with the fields that are actually used in the database
+// Define the StyleObject interface
 interface StyleObject {
   background: string;
   clothing: string;
-  // The client might still pass these fields but they're not used in the database
-  backgroundTitle?: string;
-  backgroundPrompt?: string;
-  clothingTitle?: string;
-  clothingPrompt?: string;
 }
 
 export async function updateStyles({

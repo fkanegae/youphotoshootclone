@@ -10,7 +10,6 @@ interface UserData {
   name: string;
   planType: "Basic" | "Professional" | "Executive";
   promptsResult: any[];
-  validImageUrls?: string[]; // Add support for the tracked valid image URLs
   apiStatus: {
     id: number;
   };
@@ -63,25 +62,15 @@ export async function fixDiscrepancy(userData: UserData | null) {
   };
 
   const planLimit = getPlanLimit(userData.planType);
-  const isBasicPlan = userData.planType.toLowerCase() === "basic";
   
   // Calculate total images we currently have
   const currentImages = userData.promptsResult?.reduce((total, result) => 
     total + (result.data?.prompt?.images?.length || 0), 0) || 0;
   
-  // For basic plan, also check validImageUrls
-  const validImagesCount = (isBasicPlan && userData.validImageUrls) ? userData.validImageUrls.length : 0;
-  
   console.log("Current image count:", currentImages);
-  console.log("Valid tracked images count:", validImagesCount);
   console.log("Plan limit:", planLimit);
 
-  // For basic plan, we need exactly 10 images - check both sources
-  const needsImageSync = isBasicPlan
-    ? (validImagesCount < 10 && currentImages < planLimit)
-    : (currentImages < planLimit);
-
-  if (needsImageSync && userData.apiStatus?.id) {
+  if (currentImages < planLimit && userData.apiStatus?.id) {
     try {
       console.log("Fetching prompts from Astria...");
       const astriaPrompts = await getAstriaPrompts(userData.apiStatus.id.toString());
@@ -132,63 +121,18 @@ export async function fixDiscrepancy(userData: UserData | null) {
         result !== null && result.data.prompt.images.length > 0
       );
 
-      // For basic plan, extract all valid image URLs and store them separately too
-      let validImageUrls: string[] = [];
-      
-      if (isBasicPlan) {
-        // Extract all image URLs from all prompts
-        const allImageUrls = filteredPrompts.flatMap(result => 
-          result.data.prompt.images.filter(url => 
-            typeof url === 'string' && url.startsWith('http')
-          )
-        );
-        
-        // Deduplicate and ensure we have at most 10 URLs
-        validImageUrls = Array.from(new Set(allImageUrls)).slice(0, 10);
-        
-        // If we still don't have enough, add in any from the user's existing validImageUrls
-        if (validImageUrls.length < 10 && userData.validImageUrls && userData.validImageUrls.length > 0) {
-          // Combine existing and new, deduplicate, and cap at 10
-          validImageUrls = Array.from(
-            new Set([...validImageUrls, ...userData.validImageUrls])
-          ).slice(0, 10);
-        }
-        
-        console.log(`Collected ${validImageUrls.length} valid image URLs for basic plan user`);
-      }
-
-      // Update user with the filtered prompts and valid image URLs for basic plan
-      const updateData: {
-        promptsResult: any[];
-        validImageUrls?: string[];
-      } = {
+      // Update user with the filtered prompts
+      await updateUser({
         promptsResult: filteredPrompts
-      };
-      
-      // Only add validImageUrls for basic plan
-      if (isBasicPlan && validImageUrls.length > 0) {
-        updateData.validImageUrls = validImageUrls;
-      }
-      
-      await updateUser(updateData);
+      });
 
       const totalImages = filteredPrompts.reduce((total, result) => 
         total + (result.data.prompt.images.length || 0), 0
       );
 
       console.log("Total images after sync:", totalImages);
-      console.log("Total valid tracked images:", validImageUrls.length);
       console.log("Missing images:", planLimit - totalImages);
 
-      // For basic plan, ensure we're returning the full filtered prompts with validImageUrls
-      if (isBasicPlan) {
-        // Add validImageUrls to the userData we return
-        return {
-          ...filteredPrompts,
-          validImageUrls
-        };
-      }
-      
       return filteredPrompts;
     } catch (error) {
       console.error("Error in fixDiscrepancy:", error);
