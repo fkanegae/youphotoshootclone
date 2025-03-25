@@ -117,7 +117,7 @@ export default async function Page() {
           </h2>
 
           <p className="text-mainBlack mb-4 text-sm text-left">
-            You've selected the following style combinations for your headshots:
+            You&apos;ve selected the following style combinations for your headshots:
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
